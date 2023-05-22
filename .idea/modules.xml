@@ -2,6 +2,12 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Scheduler/Bankers Algorithm/Bankers Algorithm.iml" filepath="$PROJECT_DIR$/Scheduler/Bankers Algorithm/Bankers Algorithm.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Scheduler/CPUScheduler_V1/CPUScheduler_V1.iml" filepath="$PROJECT_DIR$/Scheduler/CPUScheduler_V1/CPUScheduler_V1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Scheduler/CPUScheduler_V2/CPUScheduler_V2.iml" filepath="$PROJECT_DIR$/Scheduler/CPUScheduler_V2/CPUScheduler_V2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Scheduler/CPUScheduler_V3/CPUScheduler_V3.iml" filepath="$PROJECT_DIR$/Scheduler/CPUScheduler_V3/CPUScheduler_V3.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Scheduler/CPUScheduler_V3(solution)/CPUScheduler_V3(solution).iml" filepath="$PROJECT_DIR$/Scheduler/CPUScheduler_V3(solution)/CPUScheduler_V3(solution).iml" />
+      <module fileurl="file://$PROJECT_DIR$/Scheduler/CPUScheduler_V4/CPUScheduler_V4.iml" filepath="$PROJECT_DIR$/Scheduler/CPUScheduler_V4/CPUScheduler_V4.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/INU_Practices.iml" filepath="$PROJECT_DIR$/.idea/INU_Practices.iml" />
     </modules>
   </component>

@@ -1,4 +1,5 @@
 import java.util.Scanner;
+
 public class Bankers {
 	private int need[][],allocate[][],max[][],avail[],numP,numR;
 

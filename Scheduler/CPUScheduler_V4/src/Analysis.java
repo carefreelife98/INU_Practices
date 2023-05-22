@@ -182,13 +182,16 @@ public class Analysis {
 	{
 		for (int k=0; k<pInfo.numTask; k++)
 		{
-			
+			Task task_k = pInfo.tasks.get(k);
+			int sum=0;
 			for (int i=0; i<pInfo.numTask; i++)
-			{								
-				
-								
-			}	
-			
+			{
+				Task task_i = pInfo.tasks.get(i);
+				if (i!=k)
+					sum+=Math.min(workloadEDF(task_i.Period, task_i.execTime, task_i.Deadline, task_k.Deadline),task_k.Deadline-task_k.execTime+1);
+			}
+			if (sum/pInfo.numProcessor+task_k.execTime>task_k.Deadline)
+				return 0;
 		}
 		return 1;
 	}
@@ -201,7 +204,9 @@ public class Analysis {
 	}	
 	
 	public static int workloadEDF(double T, double C, double D, double L) {
-		return 0;
+		int N=((int)L/(int)T);
+//		int N = ((int) L + (int) D - (int) C) / (int) T;
+		return N * (int) C + Math.min((int) C, (int) L - (int) N * (int) T);
 	}
 	
 }
