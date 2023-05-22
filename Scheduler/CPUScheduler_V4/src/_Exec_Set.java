@@ -28,8 +28,9 @@ public class _Exec_Set {
 		exec(1003);	// DA test for any scheduling algorithm on multiprocessor platforms ()
 //		exec(1004);
 //		exec(1005);
-		exec(1006); // DA test for EDF on multiprocessor platforms
-		
+//		exec(1006); // DA test for EDF on multiprocessor platforms
+		exec(1007); // RTA test for EDF on multiprocessor platforms
+
 	}
 	public static void exec(int scheduler) {
 

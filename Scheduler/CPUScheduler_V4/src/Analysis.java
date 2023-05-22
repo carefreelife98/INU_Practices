@@ -14,38 +14,42 @@ public class Analysis {
 		int schedulable=0;
 		
 		switch(p.scheduler) {
-		case 1000:	//utilization bound for RM (only for Uniprocessor)	
-			schedulable=UBTestforRM_Uni();  
-			break;
-		
-		case 1001: 	//utilization bound for EDF  (only for Uniprocessor) 
-			schedulable=UBTestforEDF_Uni();
-			break;
-			
-		case 1002:	//RTA for RM (only for Uniprocessor)
-			schedulable=RTATestforRM_Uni();
-			break;
-		
-			
-		case 1003:	//DA test for any scheduling (applicable for both Uni- and Multiprocessor)
-			schedulable=DATest_Multi_V1();
-			break;
-			
-		case 1004:	//DA test for RM scheduling (applicable for both Uni- and Multiprocessor)
-			schedulable=DATestforRM_Multi_V2();
-			break;
-			
-		case 1005:	//DA test for RM scheduling (applicable for both Uni- and Multiprocessor)
-			schedulable=RTATestforRM_Multi();
-			break;
-		
-		case 1006:  //DA test for EDF scheduling (applicable for both Uni- and Multiprocessor)
-			schedulable=DATestforEDF_Multi();
-			break;
-			
+
+			case 1000:	//utilization bound for RM (only for Uniprocessor)
+				schedulable=UBTestforRM_Uni();
+				break;
+
+			case 1001: 	//utilization bound for EDF  (only for Uniprocessor)
+				schedulable=UBTestforEDF_Uni();
+				break;
+
+			case 1002:	//RTA for RM (only for Uniprocessor)
+				schedulable=RTATestforRM_Uni();
+				break;
+
+			case 1003:	//DA test for any scheduling (applicable for both Uni- and Multiprocessor)
+				schedulable=DATest_Multi_V1();
+				break;
+
+			case 1004:	//DA test for RM scheduling (applicable for both Uni- and Multiprocessor)
+				schedulable=DATestforRM_Multi_V2();
+				break;
+
+			case 1005:	//DA test for RM scheduling (applicable for both Uni- and Multiprocessor)
+				schedulable=RTATestforRM_Multi();
+				break;
+
+			case 1006:  //DA test for EDF scheduling (applicable for both Uni- and Multiprocessor)
+				schedulable=DATestforEDF_Multi();
+				break;
+
+			case 1007:	//RTA test for EDF scheduling (applicable for both Uni- and Multiprocessor):
+				schedulable=RTATestforEDF_Multi();
+				break;
+
 		}
 
-		String result=schedulable+" "+pInfo.numTask;
+		String result = schedulable + " " + pInfo.numTask;
 
 		return result;
 	}
@@ -195,7 +199,10 @@ public class Analysis {
 		}
 		return 1;
 	}
-	
+
+    public int RTATestforEDF_Multi() {
+        return 0;
+    }
 	
 	
 	public int workloadWC(double T, double C, double D, double L) {

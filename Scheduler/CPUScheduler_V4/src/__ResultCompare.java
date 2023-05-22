@@ -14,8 +14,8 @@ public class __ResultCompare {
     public static int TT=0, TF=0, FT=0, FF =0;
 	public static void main(String[] args) {
 
-		int ref1[] = {11};
-		int ref2[] = {1006};
+		int ref1[] = {1003};
+		int ref2[] = {1007};
 
 		int isSporadic = 0;
 		int type = 0;
