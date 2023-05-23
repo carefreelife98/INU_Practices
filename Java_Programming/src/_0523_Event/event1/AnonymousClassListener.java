@@ -1,4 +1,4 @@
-package _0523_Event;
+package _0523_Event.event1;
 
 import javax.swing.*;
 import java.awt.*;

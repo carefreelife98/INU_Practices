@@ -1,10 +1,9 @@
-package _0523_Event;
+package _0523_Event.event1;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.security.cert.TrustAnchor;
 
 public class IndepClassListener extends JFrame {
     public IndepClassListener() {
