@@ -1,0 +1,20 @@
+<component name="libraryTable">
+  <library name="INU_Practices">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/Java_Programming/src" />
+      <root url="file://$PROJECT_DIR$/Scheduler/Bankers Algorithm/src" />
+      <root url="file://$PROJECT_DIR$/Scheduler/CPUScheduler_V1/src" />
+      <root url="file://$PROJECT_DIR$/Scheduler/CPUScheduler_V2/src" />
+      <root url="file://$PROJECT_DIR$/Scheduler/CPUScheduler_V3(solution)/src" />
+      <root url="file://$PROJECT_DIR$/Scheduler/CPUScheduler_V3/src" />
+      <root url="file://$PROJECT_DIR$/Scheduler/CPUScheduler_V4/src" />
+      <root url="file://$PROJECT_DIR$/Scheduler/HW_9/Bankers Algorithm/src" />
+      <root url="file://$PROJECT_DIR$/Scheduler/OS_HW/Practice_2,3" />
+      <root url="file://$PROJECT_DIR$/Scheduler/OS_HW/Practice_4" />
+    </SOURCES>
+  </library>
+</component>

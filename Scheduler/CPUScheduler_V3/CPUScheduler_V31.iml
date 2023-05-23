@@ -7,6 +7,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="INU_Practices" level="project" />
+    <orderEntry type="library" name="INU_Practices" level="project" />
   </component>
 </module>
