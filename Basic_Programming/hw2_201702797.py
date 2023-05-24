@@ -5,8 +5,13 @@ def list_to_str(str_list):
         result += str(s) + ""
     return result.strip()
 
+# 소수점 아래 마지막 부터 0 제거
 def delete_zero(str_list):
-    for
+    for i in range(len(str_list)-1, -1, -1):
+        if str_list[i] == 0:
+            str_list.pop(i)
+        else:
+            break
 
 # '0' 과 '.' 을 제외한 str과 진법이 입력되면 곱셈 연산 실행.
 def multiple_number(list_str, n, rs):
@@ -41,7 +46,7 @@ def multiple_number(list_str, n, rs):
     while i >= 0:
         result.append(result.pop(i))
         i -= 1
-    print(rs)
+
     return result
 
 def convert_to_n_ary(in_str: str, to_ary: int) -> str:
@@ -53,11 +58,11 @@ def convert_to_n_ary(in_str: str, to_ary: int) -> str:
 
     rs = []
     while len(rs) != 1000:
-        print(f'생성된 list: {list_str}')
+        # print(f'생성된 list: {list_str}')
         list_str = multiple_number(list_str, to_ary, rs)
-        print(f'변환된 list: {list_str}')
-        print('--------------------------')
-    delete_zero(list_str)
+        # print(f'변환된 list: {list_str}')
+        # print('--------------------------')
+    delete_zero(rs)
     return f"0.{list_to_str(rs)}"
 
 if __name__ == '__main__':
