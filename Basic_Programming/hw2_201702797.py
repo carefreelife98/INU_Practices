@@ -69,13 +69,13 @@ if __name__ == '__main__':
     # Please write here to test your function
     print(convert_to_n_ary('0.8125', 2))
     # print('--------------------------')
-    # print(convert_to_n_ary('0.25', 8))
+    print(convert_to_n_ary('0.25', 8))
     # print('--------------------------')
     # print(convert_to_n_ary('0.25', 7))
     # print('--------------------------')
-    # print(convert_to_n_ary('0.7', 8))
+    print(convert_to_n_ary('0.7', 8))
     # print('--------------------------')
-    # print(convert_to_n_ary('0.5', 4))
+    print(convert_to_n_ary('0.5', 4))
     # print('--------------------------')
     # print(convert_to_n_ary('0.1', 2))
     # print('--------------------------')
@@ -87,3 +87,4 @@ if __name__ == '__main__':
     # print(convert_to_n_ary('0.123', 2))
     # print(convert_to_n_ary('0.97531', 9))
     # print(convert_to_n_ary('0.456', 4))
+
