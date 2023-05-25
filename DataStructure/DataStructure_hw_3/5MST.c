@@ -25,7 +25,7 @@ void init(GraphType* g)
 	g->n = 0;
 	for (r = 0; r<MAX_VERTICES; r++)
 		for (c = 0; c<MAX_VERTICES; c++)
-			g->weight[r][c] = 0;
+			g->weight[r][c] = INF;
 }
 
 // 정점 삽입 연산
@@ -101,14 +101,18 @@ void read_data(Data *data) {
     FILE *fp;
     fp = fopen("students2.txt", "r"); // 읽기 모드로 파일을 연다.
 
-    printf("fopen\n");
+    if (fp == NULL) {
+        printf("파일을 열 수 없습니다.\n");
+        return;
+    }
+
     // 파일에서 데이터를 읽어와 구조체에 저장.
     char buf[30];
     int i = 0;
     printf("while start\n");
     while (fgets(buf, 30, fp) != NULL) {
         // 각 행의 데이터를 구조체에 저장
-        fscanf(fp, buf, "%d %d %d", &data[i].me, &data[i].you, &data[i].love);
+        sscanf(buf, "%d %d %d", &data[i].me, &data[i].you, &data[i].love);
         printf("me: %d, you: %d, love: %d\n", data[i].me, data[i].you, data[i].love);
         i++;
     }
@@ -120,7 +124,7 @@ void read_data(Data *data) {
 void print_students_data(Data* data) {
     printf("\n ------------------파일 읽기 시작-------------------- \n");
     // printf("me\tyou\tlove\n");
-    for (int i = 0; i < MAX_VERTICES; i++) {
+    for (int i = 0; i < 1000; i++) {
         printf("%d\t%d\t%d\n", data[i].me, data[i].you, data[i].love);
     }
     printf(" ------------------파일 읽기 끝-------------------- \n\n");
@@ -128,7 +132,7 @@ void print_students_data(Data* data) {
 
 int main(void){
     printf("시작\n");
-    Data data[MAX_VERTICES];
+    Data data[1000];
     printf("데이터 생성\n");
     read_data(data);
     printf("데이터 읽음\n");
