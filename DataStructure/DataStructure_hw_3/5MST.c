@@ -11,13 +11,20 @@
 
 //////////////////////////////// 구조체, 정의 시작 //////////////////////////////
 
-// 파일에서 읽은 데이터
+// FILE로 읽은 데이터
 typedef struct {
     int me;
     int you;
     float love;
+    int twin;
 } Data;
 
+// 한 학생당 전체 학생과의 관계.
+typedef struct {
+    int me;
+    int you[MAX_VERTICES];
+    float love[MAX_VERTICES];
+} Data_heap;
 
 typedef struct {
 	Data heap[FILE_LEN];
@@ -100,17 +107,30 @@ void heap_sort(Data data[], int n){
 
 //////////////////////////////// 친밀도 계산 시작 //////////////////////////////
 
+// 학생 0 ~ 99 까지 각 학생과 나머지 학생들 간의 친밀도 계산하기
+// 0~99 학생과의 친밀도를 11로 초기화
+void init_data(Data_heap* data_heap){
+    for(int i = 0; i < MAX_VERTICES; i++){
+        data_heap[i].me = i;
+        for(int j = 0; j < MAX_VERTICES; j++){
+            data_heap[i].you[j] = j;
+            data_heap[i].love[j] = (float)11;
+        }
+    }
+}
+
+// 변경 값이 있는 Data 배열을 가져와 Data_heap 배열 최신화
+
+
 void delete_data(Data* data, int* size, int index){
     if (index < 0 || index >= *size) {
         printf("유효하지 않은 인덱스입니다.\n");
         return;
     }
-
     // 삭제할 요소 이후의 요소들을 한 칸씩 앞으로 당김
     for (int i = index; i < (*size - 1); i++) {
         data[i] = data[i + 1];
     }
-
     // 배열의 크기를 1 감소시킴
     (*size)--;
 }
@@ -118,6 +138,8 @@ void delete_data(Data* data, int* size, int index){
 void calculate_love(Data* data){
     int total = 0;
     for(int i = 0; i < FILE_LEN; i++){
+        data[i].twin = 0;
+        // 만약 양방향 love 였다면 아래에서 서로의 평균으로 갱신된다.
         for(int j = 0; j < FILE_LEN; j++){
             // j_you가 데이터를 처음부터 읽으며 i_me와 같은 데이터를 찾는다.(양 방향 love 찾기)
             if (data[i].me == data[j].you && data[i].you == data[j].me){
@@ -125,15 +147,19 @@ void calculate_love(Data* data){
                 // 둘의 평균으로 love 변경.
                 data[i].love = love; 
                 data[j].love = love;
-                printf("양방향 love [%d] <-[love: %f]-> [%d]\n", data[i].me, love, data[i].you);
+                // 갱신된 값이라고 표기
+                data[i].twin = 1;
+                data[j].twin = 1;
+                printf("양방향 love [%d] <-[love: %f]-> [%d]    ", data[i].me, love, data[i].you);
                 total++;
+                if(total % 2 == 0){
+                    printf("\n");
+                }
             }
-            // // 단 방향 love
-            // else if (data[i].me == data[j].you && data[i].you != data[j].me){
-            //     float love = (data[i].love + 11) / 2;
-            //     printf("단방향 love [%d] [love: %f]-> [%d]\n", data[i].me, love, data[i].you);
-            //     total++;
-            // }
+        }
+        if (data[i].twin == 0){
+            // 위 for문에서 twin = 1 로 체크되지 않은 단방향 love는 11을 더해 평균을 구한다.
+            data[i].love = (data[i].love + 11) / 2;
         }
     }
     printf("total = [%d]\n", total);
@@ -156,11 +182,13 @@ void read_data_to_struct(Data *data) {
     // 파일에서 데이터를 읽어와 구조체에 저장.
     char buf[30];
     int i = 0;
-    printf("while start\n");
     while (fgets(buf, 30, fp) != NULL) {
         // 각 행의 데이터를 구조체에 저장
         sscanf(buf, "%d %d %f", &data[i].me, &data[i].you, &data[i].love);
-        // printf("me: %d, you: %d, love: %f\n", data[i].me, data[i].you, data[i].love);
+        // printf("me: %d, you: %d, love: %f ", data[i].me, data[i].you, data[i].love);
+        if(i % 2 == 0){
+            printf("\n");
+        }
         i++;
     }
     printf("FILE legth: [%d]\n", i);
@@ -224,10 +252,10 @@ int main(void){
     // cal_love(h->heap, data);
     calculate_love(data);
     // printf("------------변경후 data----------");
-    heap_sort(data, FILE_LEN);
+    // heap_sort(data, FILE_LEN);
     // for(int i = 0; i < FILE_LEN; i++){
     //     printf("%f ", data[i].love);
     // }
+    print_data(data);
     return 0;
-    // print_data(data);
 }
