@@ -1,0 +1,10 @@
+#!/bin/sh
+'''exec' "/Users/carefreelife/Desktop/인천대학교/2023_4학년_1학기/프로그래밍 입문/venv/bin/python" "$0" "$@"
+' '''
+# -*- coding: utf-8 -*-
+import re
+import sys
+from pip._internal.cli.main import main
+if __name__ == '__main__':
+    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
+    sys.exit(main())

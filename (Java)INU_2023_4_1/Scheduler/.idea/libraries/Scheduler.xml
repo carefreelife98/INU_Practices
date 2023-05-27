@@ -1,0 +1,19 @@
+<component name="libraryTable">
+  <library name="Scheduler">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/Bankers Algorithm/src" />
+      <root url="file://$PROJECT_DIR$/CPUScheduler_V1/src" />
+      <root url="file://$PROJECT_DIR$/CPUScheduler_V2/src" />
+      <root url="file://$PROJECT_DIR$/CPUScheduler_V3(solution)/src" />
+      <root url="file://$PROJECT_DIR$/CPUScheduler_V3/src" />
+      <root url="file://$PROJECT_DIR$/CPUScheduler_V4/src" />
+      <root url="file://$PROJECT_DIR$/HW_9/Bankers Algorithm/src" />
+      <root url="file://$PROJECT_DIR$/OS_HW/Practice_2,3" />
+      <root url="file://$PROJECT_DIR$/OS_HW/Practice_4" />
+    </SOURCES>
+  </library>
+</component>
