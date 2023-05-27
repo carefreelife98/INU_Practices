@@ -200,53 +200,24 @@ public class Analysis {
 		return 1;
 	}
 
-//    public int RTATestforEDF_Multi() {
-//		for (int k = 0; k < pInfo.numTask; k++) {
-//
-//			Task task_k = pInfo.tasks.get(k);
-//			int interval = (int)task_k.execTime;
-//			int sum = 0;
-//			for (int i = 0; i < pInfo.numTask; i++) {
-//				Task task_i = pInfo.tasks.get(i);
-//				if (i != k)
-//					sum += Math.min(workloadRTAforEDF(task_i.Period, task_i.execTime, task_i.Deadline, interval), task_k.Deadline - task_k.execTime + 1);
-//			}
-//			if ((sum) / pInfo.numProcessor + task_k.execTime > interval)
-//				return 0;
-//		}
-//		return 1;
-//    }
-	public int RTATestforEDF_Multi()
-	{
-		for (int k=0; k<pInfo.numTask; k++)
-		{
+    public int RTATestforEDF_Multi() {
+
+		for (int k = 0; k < pInfo.numTask; k++) {
+
 			Task task_k = pInfo.tasks.get(k);
 			int interval= (int)task_k.execTime;
-			boolean pass=false;
-
-			while (interval<= (int)task_k.Deadline && pass==false)
-			{
-				int sum=0;
-				for (int i=0; i<pInfo.numTask; i++)
-				{
-					Task task_i = pInfo.tasks.get(i);
-					if (i!=k)
-					{
-						sum+=Math.min(workloadRTAforEDF(task_i.Period, task_i.execTime, task_i.Deadline, interval),(int)task_k.Deadline - (int)task_k.execTime + 1);
-					}
-				}
-				int new_interval = sum/pInfo.numProcessor+(int)task_k.execTime;
-				if (interval>=new_interval)
-					pass=true;
-				else
-					interval = new_interval;
+			int sum = 0;
+			for (int i = 0; i < pInfo.numTask; i++) {
+				Task task_i = pInfo.tasks.get(i);
+				if (i != k)
+					sum += Math.min(workloadRTAforEDF(task_i.Period, task_i.execTime, task_i.Deadline, interval), task_k.Deadline - task_k.execTime + 1);
 			}
-			if (pass==false)
+			if (sum / pInfo.numProcessor + task_k.execTime > task_k.Deadline)
 				return 0;
 		}
 		return 1;
-	}
-
+    }
+	
 	
 	public int workloadWC(double T, double C, double D, double L) {
 		int N=((int)L+(int)D-(int)C)/(int)T;
@@ -259,8 +230,8 @@ public class Analysis {
 	}
 
 	public static int workloadRTAforEDF(double T, double C, double D, double L) {
-		int N = (((int) L / (int) T)); //𝑁_𝑖 (𝑅_𝑘^𝑛 )=⌊(𝑅_𝑘^𝑛)/𝑇_𝑖 ⌋
-		return N * (int) C + Math.min((int) C, (int) L - (int) N * (int) T); //𝐼_𝑘^𝑖(𝑅_𝑘^𝑛)=𝑁_𝑖 (𝑅_𝑘^𝑛 )∙𝐶_𝑖+min⁡(𝐶_𝑖,𝑅_𝑘^𝑛−𝑁_𝑖 (𝑅_𝑘^𝑛)∙𝑇_𝑖)
+		int N = ((int) L + (int) C - 1 / (int) T);
+		return N * (int) C + Math.min((int) C, (int) L - (int) N * (int) T);
 	}
 	
 }
