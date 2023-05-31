@@ -1,3 +1,5 @@
+package HW_3;
+
 package _0530_SwingComponent;
 
 import javax.swing.*;
@@ -28,7 +30,7 @@ public class RadioButtonItemEventEx extends JFrame {
             radio[i] = new JRadioButton(text[i]);
             g.add(radio[i]);
             radioPanel.add(radio[i]);
-            radio[i].addItemListener(new MyItemListener());
+            radio[i].addItemListener(new _0530_SwingComponent.RadioButtonItemEventEx.MyItemListener());
         }
 
         radio[2].setSelected(true);
@@ -53,7 +55,7 @@ public class RadioButtonItemEventEx extends JFrame {
     }
 
     public static void main(String[] args) {
-        new RadioButtonItemEventEx();
+        new _0530_SwingComponent.RadioButtonItemEventEx();
     }
 }
 
