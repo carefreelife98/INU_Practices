@@ -53,8 +53,6 @@ public class _5_lotto {
     }
 
     public static void main(String[] args) {
-
-
         Scanner scan = new Scanner(System.in);
         do {
             System.out.println("ENTER 를 눌러 로또 번호를 생성: ");

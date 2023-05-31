@@ -2,8 +2,10 @@
 #include<stdlib.h>
 
 #define MAX_VERTICES 50
+#define TRUE 1
+#define FALSE 0
 
-/////////////////////////////////// 인접 행렬 ///////////////////////////////////
+// ///////////////////////////////// 인접 행렬 ///////////////////////////////////
 // typedef struct GraphType_mat {
 //     int n; //정점의 개수
 //     int adj_mat[MAX_VERTICES][MAX_VERTICES];
@@ -52,9 +54,22 @@
 //     }
 // }
 
+// // DFS Algorithm_adj_mat
+// int visited[MAX_VERTICES];
+// void dfs_mat(GraphType_mat* g, int v){
+//     int w;
+//     visited[v] = TRUE; // 정점 v의 방문 표시
+//     printf("정점 %d -> ", v); // 방문한 정점 출력
+//     for(w = 0; w < g->n; w++){
+//         if(g->adj_mat[v][w] && !visited[w]){
+//             dfs_mat(g, w); // 정점 w에서 DFS 새로 시작.
+//         }
+//     }
+// }
+
 // int main(){
-// 	GraphType *g;
-// 	g = (GraphType *)malloc(sizeof(GraphType));
+// 	GraphType_mat *g;
+// 	g = (GraphType_mat *)malloc(sizeof(GraphType_mat));
 	
 //     init_graph(g);
 
@@ -67,21 +82,29 @@
 // 	insert_edge(g, 0, 3);
 // 	insert_edge(g, 1, 2);
 // 	insert_edge(g, 2, 3);
-// 	print_adj_mat(g);
-
+// 	// print_adj_mat(g);
+//     printf("깊이 우선 탐색\n");
+//     dfs_mat(g, 0);
+//     printf("\n");
 // 	free(g);
+//     return 0;
 // }
 
 /////////////////////////////////// 인접 리스트 ///////////////////////////////////
 
+#include<stdio.h>
+#include<stdlib.h>
+
+#define MAX_VERTICES 50
+
 typedef struct GraphNode{
-    int vertex;
-    struct GraphNode* link;
+    int vertex; // 노드의 번호 저장.
+    struct GraphNode* link; // 다음 노드를 가리킨다.
 }GraphNode;
 
 typedef struct GraphType {
     int n; // 정점의 개수
-    GraphNode* adj_list[MAX_VERTICES]; // 인접 리스트
+    GraphNode* adj_list[MAX_VERTICES]; // 인접 리스트 - 각 연결리스트의 첫번째 번호 저장.
 }GraphType;
 
 // 그래프 초기화
@@ -132,6 +155,21 @@ void print_adj_list(GraphType* g){
     }
 }
 
+int visited[MAX_VERTICES];
+
+// 인접 리스트로 표현된 그래프에 대한 깊이 우선 탐색
+void dfs_list(GraphType* g, int v){
+    GraphNode* w;
+    visited[v] = TRUE; // 정점 v의 방문 표시
+    printf("정점 %d -> ", v); //방문한 정점 출력
+    for(w = g->adj_list[v]; w; w = w->link){    // 인접 정점 탐색
+        // 만약 인접 정점 중 방문하지 않은 노드가 있다면
+        if(!visited[w->vertex]){
+            dfs_list(g, w->vertex); //정점 w에서 dfs 새로 시작.
+        }
+    }
+}
+
 int main(void){
     GraphType* g;
     g = (GraphType*)malloc(sizeof(GraphType));
@@ -149,7 +187,10 @@ int main(void){
     insert_edge(g, 2 ,1);
     insert_edge(g, 2 ,3);
     insert_edge(g, 3 ,2);
-    print_adj_list(g);
+    // print_adj_list(g);
+    printf("깊이 우선 탐색 - 인접 리스트 사용\n");
+    dfs_list(g, 3);
+    printf("탐색 끝\n");
     free(g);
     return 0;
 }
