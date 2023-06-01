@@ -68,15 +68,18 @@ void insert_graph_edge(GraphType* g, int u, int v){
 }
 
 void print_adj_list(GraphType* g){
+    int num = 0;
     for(int i = 0; i < g->n; i++){
         Data* p = g->adj_list[i];
         printf("정점 %d의 인접 리스트: ", i);
         while(p != NULL){
             printf("-> %d", p->me);
             p = p->link;
+            num++;
         }
         printf("\n");
     }
+    printf("%d 개\n", num);
 }
 //////////////////////////////// 그래프 생성 끝 //////////////////////////////
 
@@ -251,6 +254,7 @@ void calculate_love(Data* data){
 //////////////////////////////// 친밀도 계산 끝 //////////////////////////////
 
 //////////////////////////////// 5개 그룹화 (시작) //////////////////////////////
+
 
 void check_init(int check[]){
     // check 배열을 0 으로 초기화
@@ -464,10 +468,9 @@ int main(void){
 
     calculate_love(data);
 
-    print_data(data);
+    // print_data(data);
     /////// 100개 노드 그래프 생성 시작 ///////
     GraphType *g = (GraphType*)malloc(sizeof(GraphType));
-
     init_graph(g);
 
     for(int i = 0; i < MAX_VERTICES; i++){
@@ -477,13 +480,13 @@ int main(void){
     for(int i = 0; i < FILE_LEN; i++){
         insert_graph_edge(g, data[i].me, data[i].you);
     }
-    printf("간선 삽입 완료: %d개", )
+    printf("간선 삽입 완료\n");
     print_adj_list(g);
     /////// 100개 노드 그래프 생성 끝 ///////
-    
 
-
-    // heap_sort(data, FILE_LEN);
+    // for(int i = 0; i < MAX_VERTICES; i++){
+    bfs_list(g, 1);
+    // }
 
     return 0;
 }
