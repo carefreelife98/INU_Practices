@@ -2,22 +2,19 @@
 #include<stdlib.h>
 
 #define FILE_LEN 959
-#define TRUE 1
-#define FALSE 0
 #define MAX_VERTICES 100
-#define INF 1000.0
-#define MAX_GROUP 20
 
 #pragma warning(disable:4996)
 
 //////////////////////////////// 구조체, 정의 시작 //////////////////////////////
 
 // FILE로 읽은 데이터
-typedef struct {
+typedef struct Data{
     int me;
     int you;
     float love;
     int check;
+    struct Data* link;
 } Data;
 
 typedef struct {
@@ -27,27 +24,137 @@ typedef struct {
 
 //////////////////////////////// 구조체, 정의 끝 //////////////////////////////
 
+
+//////////////////////////////// 그래프 생성 시작 //////////////////////////////
+// typedef struct GraphNode {
+//     int me;
+//     struct GraphNode* link;
+// }GraphNode;
+
+typedef struct GraphType {
+    int n; // 정점의 개수
+    Data* adj_list[MAX_VERTICES];
+}GraphType;
+
+// 그래프 초기화
+void init_graph(GraphType* g){
+    int v;
+    g->n = 0;
+    for(v = 0; v < MAX_VERTICES; v++){
+        g->adj_list[v] = NULL;
+    }
+}
+
+// 정점 삽입 연산
+void insert_graph_vertex(GraphType* g, int v){
+    if(((g->n) + 1) > MAX_VERTICES){
+        fprintf(stderr, "그래프: 정점의 개수 초과\n");
+        return;
+    }
+    g->n++;
+}
+
+void insert_graph_edge(GraphType* g, int u, int v){
+    Data* node;
+    if(u >= g->n || v >= g->n){
+        fprintf(stderr, "그래프: 정점 번호 오류\n");
+        return;
+    }
+    node = (Data*)malloc(sizeof(Data));
+    node->me = v;
+    node->link = g->adj_list[u];
+    g->adj_list[u] = node;
+    // printf("%d -> 간선 추가 \n", node->me);
+}
+
+void print_adj_list(GraphType* g){
+    for(int i = 0; i < g->n; i++){
+        Data* p = g->adj_list[i];
+        printf("정점 %d의 인접 리스트: ", i);
+        while(p != NULL){
+            printf("-> %d", p->me);
+            p = p->link;
+        }
+        printf("\n");
+    }
+}
+//////////////////////////////// 그래프 생성 끝 //////////////////////////////
+
+//////////////////////////////// 너비 우선 탐색 시작 //////////////////////////////
+#define MAX_QUEUE_SIZE 100
+typedef int element;
+
+//큐 타입
+typedef struct{
+    element queue[MAX_QUEUE_SIZE];
+    int front, rear;
+}QueueType;
+
+void error(char* message){
+    fprintf(stderr, "%s\n", message);
+    exit(1);
+}
+
+//큐 초기화
+void queue_init(QueueType* q){
+    q->front = q->rear = 0;
+}
+
+int is_empty(QueueType* q){
+    return (q->front == q->rear);
+}
+
+//포화 상태 검출 함수
+int is_full(QueueType* q){
+    return ((q->rear + 1) % MAX_QUEUE_SIZE == q->front);
+}
+
+//삽입 함수
+void enqueue(QueueType* q, element item){
+    if(is_full(q)){
+        error("큐가 포화상태\n");
+    }    
+    q->rear = (q->rear + 1) % MAX_QUEUE_SIZE;
+    q->queue[q->rear] = item;
+}
+
+element dequeue(QueueType* q){
+    if(is_empty(q)){
+        error("큐가 공백\n");
+    }
+    q->front = (q->front + 1) % MAX_QUEUE_SIZE;
+    return q->queue[q->front];
+}
+
+#define TRUE 1
+#define FALSE 0
+
+int visited[MAX_VERTICES];
+void bfs_list(GraphType* g, int v){
+    Data* w;
+    QueueType* q;
+
+    queue_init(q);
+    visited[v] = TRUE;
+    printf("%d 방문 -> ", v);
+    enqueue(q, v);
+    while (!is_empty(q)){
+        v = dequeue(q);
+        for(w = g->adj_list[v]; w; w= w->link){
+            if(!visited[w->me]){
+                visited[w->me] = TRUE;
+                printf("%d 방문 -> ", w->me);
+                enqueue(q, w->me);
+            }
+        }
+    }
+}
+
+//////////////////////////////// 너비 우선 탐색 끝 //////////////////////////////
+
+
+
 //////////////////////////////// priority queue (힙 정렬) 시작 //////////////////////////////
-
-// // 동적 메모리 할당
-// HeapType* create(){
-//     return (HeapType*)malloc(sizeof(HeapType));
-// }
-
-// void init_heap(HeapType *h){
-//     h->heap_size = 0;
-// }
-
-// // void print_heap_data(Data data[]){
-// //     printf("heap_data 출력\n");
-// //     // heap 은 index : [0]을 사용하지 않으므로 heap[1]부터 시작
-// //     for(int i = 0; i < FILE_LEN; i++){
-// //         printf("me: [%d], you : [%d], love : [%f]   ", h->heap[i].me, h->heap[i].you, h->heap[i].love);
-// //         if (i % 3 == 0) {
-// //             printf("\n");
-// //         }
-// //     }
-// // }
 
 void print_data(Data* data){
     printf("Data data[FILE_len] 출력\n");
@@ -58,76 +165,6 @@ void print_data(Data* data){
         // }
     }
 }
-
-// // heap 삽입
-// void insert_love_max_heap(HeapType* h, Data item){
-//     // i = 현재 heap의 요소 개수
-//     int i;
-//     i = ++(h->heap_size);
-//     // 트리를 거슬러 올라가며 부모 노드와 비교
-//     // item.love (자식 노드 = 현재 노드) > h->heap[i / 2].love (부모 노드)
-//     // heap 에서 (자식 노드 / 2) 는 부모노드의 인덱스이다.
-//     while((i != 1) && (item.love > h->heap[i / 2].love)) {
-//         h->heap[i] = h->heap[i / 2];
-//         i /= 2;
-//     }
-//     h->heap[i] = item;
-// }
-
-// // heap 삭제
-// Data delete_love_max_heap(HeapType* h){
-//     int parent, child;
-//     Data item, temp; 
-//     item = h->heap[1]; // 루트 노드(최대 love값)의 반환을 위하여 item변수에 옮김
-//     temp = h->heap[(h->heap_size)--]; 
-//     parent = 1; // 루트노드의 인덱스는 항상 1
-//     child = 2; // 루트 노드의 왼쪽 자식부터 비교 시작. (루트노드의 왼쪽 자식의 인덱스는 항상 2)
-//     printf("heap size: [%d]", h->heap_size);
-//     // 히프트리를 벗어나지 않은 범위 이면,
-//     while(child <= h->heap_size) {
-//         // 현재 노드의 자식노드 중 더 큰 노드 찾기
-//         // 오른쪽 자식이 더 크다면 
-//         if((child < h->heap_size) && (h->heap[child].love) < h->heap[child + 1].love){
-//             child++;
-//         }
-//         if(temp.love >= h->heap[child].love) break;
-//         // 한 단계 아래 이동
-//         h->heap[parent] = h->heap[child];
-//         parent = child;
-//         child *= 2;
-//     }
-//     h->heap[parent] = temp;
-//     return item;
-// }
-
-// void heap_sort(Data data[], int n){
-//     int i;
-//     HeapType* h;
-//     h = create();
-//     init_heap(h);
-//     printf("------------------------ insert max heap ------------------------\n");
-//     for (i = 0; i < n; i++){
-//         insert_love_max_heap(h, data[i]);
-//         // printf("insert: me[%d] you[%d] love[%f]    ", data[i].me, data[i].you, data[i].love);
-//         // if (i % 3 == 0) {
-//         //     printf("\n");
-//         // }
-//     }
-//     // printf("------------------------ print heap data ------------------------\n");
-//     // print_data(data);
-//     printf("------------------------ delete max heap ------------------------\n");
-//     for(i = (n-1); i >= 0; i--){
-//         data[i] = delete_love_max_heap(h);
-//         // printf("delete: me[%d] you[%d] love[%f]    ", data[i].me, data[i].you, data[i].love);
-//         // if (i % 3 == 0) {
-//         //     printf("\n");
-//         // }
-//     }
-//     free(h);
-// }
-
-//////////////////////////////// priority queue (힙 정렬) 끝 //////////////////////////////
-////////////test
 // 배열 요소를 교환하는 함수
 void swap(Data* a, Data* b) {
     Data temp = *a;
@@ -173,7 +210,8 @@ void heapSort(Data arr[], int n) {
         heapify(arr, i, 0);
     }
 }
-////////////test end
+//////////////////////////////// priority queue (힙 정렬) 끝 //////////////////////////////
+
 //////////////////////////////// 친밀도 계산 시작 //////////////////////////////
 
 // 파일에 저장된 양방향 및 단방향 love 계산 후 data에 저장됨.
@@ -233,61 +271,58 @@ void print_not_checked(int check[]){
 }
 // 그냥 넣지 말고 data 배열의 가장 앞부터 시작해서 you를 타고 you의 가장 친한 친구.. -> 일렬로 된 그래프가 될 수 있다.
 
-// 아니면 각 학생들의 count를 세서 가장 높은 count를 가진 top 5 학생을 기준으로 5개의 그룹 짜기?
-void groupingV2(Data data[]){
-    Data main_student[5];
-    int result = 0;
-    float love_result = 300.0;
-
-    for(int i = 0; i < FILE_LEN; i++){
-        int total = 0;
-        float love_sum = 0.0;
-        for(int j = 0; j < FILE_LEN; j++){
-            if(data[i].me == data[j].me){
-                love_sum += data[j].love;
-                total++;
-            }
-            if(data[i].me == data[j].you){
-                love_sum += data[j].love;
-                total++; 
-            }
-
-        }
-        if(total >= result && love_sum <= love_result){
-            result = total;
-            love_result = love_sum;
-        }
-        printf("[%d] 학생의 언급 수 : [%d], 총 love : [%f]  ", data[i].me, total, love_sum);
-        if(i % 2 == 0){
-            printf("\n");
-        }
-    }
-    printf("total = [%d], love = [%f] \n", result, love_result);
-}
+// // 아니면 각 학생들의 count를 세서 가장 높은 count를 가진 top 5 학생을 기준으로 5개의 그룹 짜기?
+// void groupingV2(Data data[]){
+//     Data main_student[5];
+//     int result = 0;
+//     float love_result = 300.0;
+//     for(int i = 0; i < FILE_LEN; i++){
+//         int total = 0;
+//         float love_sum = 0.0;
+//         for(int j = 0; j < FILE_LEN; j++){
+//             if(data[i].me == data[j].me){
+//                 love_sum += data[j].love;
+//                 total++;
+//             }
+//             if(data[i].me == data[j].you){
+//                 love_sum += data[j].love;
+//                 total++; 
+//             }
+//         }
+//         if(total >= result && love_sum <= love_result){
+//             result = total;
+//             love_result = love_sum;
+//         }
+//         printf("[%d] 학생의 언급 수 : [%d], 총 love : [%f]  ", data[i].me, total, love_sum);
+//         if(i % 2 == 0){
+//             printf("\n");
+//         }
+//     }
+//     printf("total = [%d], love = [%f] \n", result, love_result);
+// }
 
 
-void groupingV1(Data data[], Data group[], int check[], int group_num){
-    // check[] : 0 ~ 99 까지의 학생의 소속이 있는지 확인하는 배열
-    // check 배열을 탐색하여 인덱스에 대응하는 데이터(group_num)가 존재하면 해당 인덱스와 같은 학생은 소속이 이미 있는 것.
-
-    int index = 0;
-    for(int i = 0; i < FILE_LEN; i++){
-        // 오름차순으로 정렬된 데이터의 me, you 값과 check 배열의 인덱스(0~99)를 통해
-        // 기존에 그룹화 된 학생인지 판별.
-        if(check[data[i].me] == 0 && check[data[i].you] == 0){
-            // if(index == MAX_GROUP - 1){
-            //     printf("그룹[%d]에 인원이 꽉 찼으므로 종료합니다: [%d]명\n", group_num, index + 1);
-            //     break;
-            // }
-            // 아직 소속이 없는 학생이라면 그룹에 추가.
-            group[index] = data[i];
-            printf("그룹[%d] %d번째 멤버 추가: [%d] <---love:[%f]---> [%d]\n", group_num, index, data[i].me, data[i].love, data[i].you);
-            // check 배열에 그룹의 번호를 check
-            check[data[i].me] = group_num;
-            check[data[i].you] = group_num;
-            index++;
-        }
-    }
+// void groupingV1(Data data[], Data group[], int check[], int group_num){
+//     // check[] : 0 ~ 99 까지의 학생의 소속이 있는지 확인하는 배열
+//     // check 배열을 탐색하여 인덱스에 대응하는 데이터(group_num)가 존재하면 해당 인덱스와 같은 학생은 소속이 이미 있는 것.
+//     int index = 0;
+//     for(int i = 0; i < FILE_LEN; i++){
+//         // 오름차순으로 정렬된 데이터의 me, you 값과 check 배열의 인덱스(0~99)를 통해
+//         // 기존에 그룹화 된 학생인지 판별.
+//         if(check[data[i].me] == 0 && check[data[i].you] == 0){
+//             // if(index == MAX_GROUP - 1){
+//             //     printf("그룹[%d]에 인원이 꽉 찼으므로 종료합니다: [%d]명\n", group_num, index + 1);
+//             //     break;
+//             // }
+//             // 아직 소속이 없는 학생이라면 그룹에 추가.
+//             group[index] = data[i];
+//             printf("그룹[%d] %d번째 멤버 추가: [%d] <---love:[%f]---> [%d]\n", group_num, index, data[i].me, data[i].love, data[i].you);
+//             // check 배열에 그룹의 번호를 check
+//             check[data[i].me] = group_num;
+//             check[data[i].you] = group_num;
+//             index++;
+//         }
+//     }
     // for(int i = 0; i < MAX_VERTICES; i++){
     //     if(check[i] == 0){
     //         for(int j = 0; j < FILE_LEN; j++){
@@ -305,98 +340,93 @@ void groupingV1(Data data[], Data group[], int check[], int group_num){
     //         }
     //     }
     // }
-}
+// }
 
 //////////////////////////////// 5개 그룹화 (끝) //////////////////////////////
 
 //////////////////////////////// Kruskal (시작) //////////////////////////////
-int parent[MAX_VERTICES];		// 부모 노드
-							// 초기화
-void set_init(int n)
-{
-	for (int i = 0; i<n; i++) 
-		parent[i] = -1;
-}
-// curr가 속하는 집합을 반환한다.
-int set_find(int curr)
-{
-	if (parent[curr] == -1)
-		return curr; 			// 루트 
-	while (parent[curr] != -1) curr = parent[curr];
-	return curr;
-}
-// 두개의 원소가 속한 집합을 합친다.
-void set_union(int a, int b)
-{
-	int root1 = set_find(a);	// 노드 a의 루트를 찾는다. 
-	int root2 = set_find(b);	// 노드 b의 루트를 찾는다. 
-	if (root1 != root2) 	// 합한다. 
-		parent[root1] = root2;
-}
-
-struct Edge {			// 간선을 나타내는 구조체
-	int start, end;
-    float weight;
-};
-
-typedef struct GraphType {
-	int n;	// 간선의 개수
-	struct Edge edges[2 * MAX_VERTICES];
-} GraphType;
-// 그래프 초기화 
-void graph_init(GraphType* g)
-{
-	g->n = 0;
-	for (int i = 0; i < 2 * MAX_VERTICES; i++) {
-		g->edges[i].start = 0;
-		g->edges[i].end = 0;
-		g->edges[i].weight = INF;
-	}
-}
-// 간선 삽입 연산
-void insert_edge(GraphType* g, int start, int end, float w)
-{
-	g->edges[g->n].start = start;
-	g->edges[g->n].end = end;
-	g->edges[g->n].weight = w;
-	g->n++;
-    printf("edge 추가 : [%d] <---[%f]---> [%d]\n", g->edges[g->n].start, g->edges[g->n].weight, g->edges[g->n].end);
-}
-// qsort()에 사용되는 함수
-int compare(const void* a, const void* b)
-{
-	struct Edge* x = (struct Edge*)a;
-	struct Edge* y = (struct Edge*)b;
-	return (x->weight - y->weight);
-}
-// kruskal의 최소 비용 신장 트리 프로그램
-void kruskal(GraphType *g)
-{
-	int edge_accepted = 0;	// 현재까지 선택된 간선의 수	
-	int uset, vset;			// 정점 u와 정점 v의 집합 번호
-	struct Edge e;
-
-	set_init(g->n);				// 집합 초기화
-	qsort(g->edges, g->n, sizeof(struct Edge), compare);
-
-	printf("크루스칼 최소 신장 트리 알고리즘 \n");
-	int i = 0;
-	while (edge_accepted < (g->n - 1))	// 간선의 수 < (n-1)
-	{
-		e = g->edges[i];
-		uset = set_find(e.start);		// 정점 u의 집합 번호 
-		vset = set_find(e.end);		// 정점 v의 집합 번호
-		if (uset != vset) {			// 서로 속한 집합이 다르면
-			printf("[%d] 간선 (%d,%d) %f 선택\n", i, e.start, e.end, e.weight);
-			edge_accepted++;
-			set_union(uset, vset);	// 두개의 집합을 합친다.
-		}
-		i++;
-	}
-}
-
+// int parent[MAX_VERTICES];		// 부모 노드
+// // 초기화
+// void set_init(int n)
+// {
+// 	for (int i = 0; i<n; i++) 
+// 		parent[i] = -1;
+// }
+// // curr가 속하는 집합을 반환한다.
+// int set_find(int curr)
+// {
+// 	if (parent[curr] == -1)
+// 		return curr; 			// 루트 
+// 	while (parent[curr] != -1) curr = parent[curr];
+// 	return curr;
+// }
+// // 두개의 원소가 속한 집합을 합친다.
+// void set_union(int a, int b)
+// {
+// 	int root1 = set_find(a);	// 노드 a의 루트를 찾는다. 
+// 	int root2 = set_find(b);	// 노드 b의 루트를 찾는다. 
+// 	if (root1 != root2) 	// 합한다. 
+// 		parent[root1] = root2;
+// }
+// // struct Data {			// 간선을 나타내는 구조체
+// // 	int me, you;
+// //     float love;
+// // };
+// typedef struct GraphType {
+// 	int n;	// 간선의 개수
+// 	struct Data edges[2 * MAX_VERTICES];
+// } GraphType;
+// // 그래프 초기화 
+// void graph_init(GraphType* g)
+// {
+// 	g->n = 0;
+// 	for (int i = 0; i < 2 * MAX_VERTICES; i++) {
+// 		g->edges[i].me = 0;
+// 		g->edges[i].you = 0;
+// 		g->edges[i].love = INF;
+// 	}
+// }
+// // 간선 삽입 연산
+// void insert_edge(GraphType* g, int start, int end, float w)
+// {
+// 	g->edges[g->n].me = start;
+// 	g->edges[g->n].you = end;
+// 	g->edges[g->n].love = w;
+// 	g->n++;
+//     printf("edge 추가 : [%d] <---[%f]---> [%d]\n", g->edges[g->n].me, g->edges[g->n].love, g->edges[g->n].you);
+// }
+// // qsort()에 사용되는 함수
+// int compare(const void* a, const void* b)
+// {
+// 	struct Data* x = (struct Data*)a;
+// 	struct Data* y = (struct Data*)b;
+// 	return (x->love - y->love);
+// }
+// // kruskal의 최소 비용 신장 트리 프로그램
+// void kruskal(GraphType *g)
+// {
+// 	int edge_accepted = 0;	// 현재까지 선택된 간선의 수	
+// 	int uset, vset;			// 정점 u와 정점 v의 집합 번호
+// 	struct Data e;
+// 	set_init(g->n);				// 집합 초기화
+//     int n = sizeof(e) / sizeof(e[0]);
+// 	heapSort(e, n)
+// 	printf("크루스칼 최소 신장 트리 알고리즘 \n");
+// 	int i = 0;
+// 	while (edge_accepted < (g->n - 1))	// 간선의 수 < (n-1)
+// 	{
+// 		e = g->edges[i];
+// 		uset = set_find(e.me);		// 정점 u의 집합 번호 
+// 		vset = set_find(e.you);		// 정점 v의 집합 번호
+// 		if (uset != vset) {			// 서로 속한 집합이 다르면
+// 			printf("[%d] 간선 (%d,%d) %f 선택\n", i, e.me, e.you, e.love);
+// 			edge_accepted++;
+// 			set_union(uset, vset);	// 두개의 집합을 합친다.
+// 		}
+// 		i++;
+// 	}
+// }
 //////////////////////////////// Kruskal (끝) //////////////////////////////
-
 
 //////////////////////////////// FILE 저장 및 친밀도 계산 (시작) //////////////////////////////
 
@@ -434,40 +464,26 @@ int main(void){
 
     calculate_love(data);
 
-    int n = sizeof(data) / sizeof(data[0]);
-    heapSort(data, n);
+    print_data(data);
+    /////// 100개 노드 그래프 생성 시작 ///////
+    GraphType *g = (GraphType*)malloc(sizeof(GraphType));
+
+    init_graph(g);
+
+    for(int i = 0; i < MAX_VERTICES; i++){
+        insert_graph_vertex(g, i);
+    }
+    printf("정점 삽입 완료 : %d 개\n", g->n);
+    for(int i = 0; i < FILE_LEN; i++){
+        insert_graph_edge(g, data[i].me, data[i].you);
+    }
+    printf("간선 삽입 완료: %d개", )
+    print_adj_list(g);
+    /////// 100개 노드 그래프 생성 끝 ///////
+    
 
 
     // heap_sort(data, FILE_LEN);
-    print_data(data);
 
-    // 5개 그룹화
-    // int check[MAX_VERTICES];
-    // check_init(check);
-
-    // Data Group1[MAX_VERTICES];
-    // groupingV1(data, Group1, check, 1);
-
-    // GraphType *g;
-	// g = (GraphType *)malloc(sizeof(GraphType));
-	// graph_init(g);
-    // for(int i = 0; i < MAX_VERTICES; i++){
-    //     insert_edge(g, data[i].me, data[i].you, data[i].love);
-    // }
-
-    // kruskal(g);
-    // free(g);
-
-    // print_not_checked(check);
-    // heapSort(Group1, 53);
-    // for(int i = 0; i < 53; i++){
-    //     printf("data[%d] me:[%d] you:[%d] love:[%f]\n", i, Group1[i].me, Group1[i].you, Group1[i].love);
-    // }
-    
-    // groupingV2(data);
-    // Data Group2[MAX_GROUP];
-    // Data Group3[MAX_GROUP];
-    // Data Group4[MAX_GROUP];
-    // Data Group5[MAX_GROUP];
     return 0;
 }

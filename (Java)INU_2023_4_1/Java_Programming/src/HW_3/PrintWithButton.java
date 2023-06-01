@@ -24,23 +24,24 @@ public class PrintWithButton extends JFrame {
         c.setLayout(new BorderLayout());
 
         la.setHorizontalAlignment(SwingConstants.CENTER);
-        la.setBackground(Color.YELLOW);
+        la.setBackground(Color.LIGHT_GRAY);
         la.setSize(30, 100);
+        la.setOpaque(true);
         la.setVisible(true);
+        c.add(la);
 
         p.setBackground(Color.BLACK);
         p.setSize(MAX, 200);
         p.setVisible(true);
 
         MyMouseAdapter cl = new MyMouseAdapter();
-        c.add(p, BorderLayout.NORTH);
-        c.add(la);
         for (int i = 0; i < num.length; i++){
             button[i] = new JButton(num[i]);
             button[i].setSize(BUTTON, BUTTON);
             button[i].addMouseListener(cl);
             p.add(button[i]);
         }
+        c.add(p, BorderLayout.NORTH);
     }
     class MyMouseAdapter extends MouseAdapter {
         @Override
