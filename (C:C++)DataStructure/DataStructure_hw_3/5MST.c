@@ -27,7 +27,7 @@ typedef struct Edge {			// 간선을 나타내는 구조체
     float love;
 } Edge;
 typedef struct GraphType_ {
-	int n;	// 간선의 개수
+	int n;	// 정점의 개수
 	struct Edge edges[2 * MAX_VERTICES];
 } GraphType_;
 //////////////////////////////// 구조체, 정의 끝 //////////////////////////////
@@ -397,7 +397,8 @@ void insert_edge(GraphType_* g, int start, int end, float w)
 	g->edges[g->n].me = start;
 	g->edges[g->n].you = end;
 	g->edges[g->n].love = w;
-	g->n++;
+	g->n++; // 정점 개수 + 1
+
     if(g->edges[g->n].love != 0 && (g->edges[g->n].me != 0 || g->edges[g->n].you != 0))
         printf("edge 추가 : [%d] <---[%f]---> [%d]\n", g->edges[g->n].me, g->edges[g->n].love, g->edges[g->n].you);
 }
@@ -420,14 +421,16 @@ void kruskal(GraphType_ *g)
 	heapSort(g->edges, n);
 	printf("크루스칼 최소 신장 트리 알고리즘 \n");
 	int i = 0;
-	while (edge_accepted < (g->n - 1))	// 간선의 수 < (n-1)
+
+	while (edge_accepted < MAX_VERTICES - 1)	// 간선의 수 < (n-1)
 	{
 		e = g->edges[i];
 		uset = set_find(e.me);		// 정점 u의 집합 번호 
 		vset = set_find(e.you);		// 정점 v의 집합 번호
 		if (uset != vset) {			// 서로 속한 집합이 다르면
-			printf("[%d] 간선 (%d,%d) %f 선택\n", i, e.me, e.you, e.love);
+			printf("[%d] 간선 (%d,%d) %f 선택", i, e.me, e.you, e.love);
 			edge_accepted++;
+            printf("[%d]\n", edge_accepted);
 			set_union(uset, vset);	// 두개의 집합을 합친다.
 		}
 		i++;
@@ -469,7 +472,7 @@ int main(void){
     calculate_love(data);
 
     // print_data(data);
-    
+
     /////// 100개 노드 그래프 생성 시작 ///////
     GraphType_ *g = (GraphType_*)malloc(sizeof(GraphType_));
 
@@ -492,3 +495,6 @@ int main(void){
 
     return 0;
 }
+
+
+/// 도출된 간선들 중 10의 가중치를 가진 간선 4개 있는데 그거를 삭제. -> 5개의 mst 도출.
