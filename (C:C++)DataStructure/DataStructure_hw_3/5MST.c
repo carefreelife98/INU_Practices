@@ -22,6 +22,14 @@ typedef struct {
 	int heap_size;
 } HeapType;
 
+typedef struct Edge {			// 간선을 나타내는 구조체
+	int me, you;
+    float love;
+} Edge;
+typedef struct GraphType_ {
+	int n;	// 간선의 개수
+	struct Edge edges[2 * MAX_VERTICES];
+} GraphType_;
 //////////////////////////////// 구조체, 정의 끝 //////////////////////////////
 
 
@@ -159,7 +167,7 @@ void bfs_list(GraphType* g, int v){
 
 //////////////////////////////// priority queue (힙 정렬) 시작 //////////////////////////////
 
-void print_data(Data* data){
+void print_data(Edge* data){
     printf("Data data[FILE_len] 출력\n");
     for(int i = 0; i < FILE_LEN; i++){
         printf("data[%d] me:[%d] you:[%d] love:[%f]\n", i, data[i].me, data[i].you, data[i].love);
@@ -169,14 +177,14 @@ void print_data(Data* data){
     }
 }
 // 배열 요소를 교환하는 함수
-void swap(Data* a, Data* b) {
-    Data temp = *a;
+void swap(Edge* a, Edge* b) {
+    Edge temp = *a;
     *a = *b;
     *b = temp;
 }
 
 // 최대 힙 구조를 유지하는 함수
-void heapify(Data arr[], int n, int i) {
+void heapify(Edge arr[], int n, int i) {
     int largest = i;    // 루트 노드
     int left = 2 * i + 1;    // 왼쪽 자식 노드
     int right = 2 * i + 2;    // 오른쪽 자식 노드
@@ -199,7 +207,7 @@ void heapify(Data arr[], int n, int i) {
 }
 
 // Heap Sort 함수
-void heapSort(Data arr[], int n) {
+void heapSort(Edge arr[], int n) {
     // 초기 힙 구조 생성
     for (int i = n / 2 - 1; i >= 0; i--)
         heapify(arr, n, i);
@@ -349,87 +357,83 @@ void print_not_checked(int check[]){
 //////////////////////////////// 5개 그룹화 (끝) //////////////////////////////
 
 //////////////////////////////// Kruskal (시작) //////////////////////////////
-// int parent[MAX_VERTICES];		// 부모 노드
-// // 초기화
-// void set_init(int n)
-// {
-// 	for (int i = 0; i<n; i++) 
-// 		parent[i] = -1;
-// }
-// // curr가 속하는 집합을 반환한다.
-// int set_find(int curr)
-// {
-// 	if (parent[curr] == -1)
-// 		return curr; 			// 루트 
-// 	while (parent[curr] != -1) curr = parent[curr];
-// 	return curr;
-// }
-// // 두개의 원소가 속한 집합을 합친다.
-// void set_union(int a, int b)
-// {
-// 	int root1 = set_find(a);	// 노드 a의 루트를 찾는다. 
-// 	int root2 = set_find(b);	// 노드 b의 루트를 찾는다. 
-// 	if (root1 != root2) 	// 합한다. 
-// 		parent[root1] = root2;
-// }
-// // struct Data {			// 간선을 나타내는 구조체
-// // 	int me, you;
-// //     float love;
-// // };
-// typedef struct GraphType {
-// 	int n;	// 간선의 개수
-// 	struct Data edges[2 * MAX_VERTICES];
-// } GraphType;
-// // 그래프 초기화 
-// void graph_init(GraphType* g)
-// {
-// 	g->n = 0;
-// 	for (int i = 0; i < 2 * MAX_VERTICES; i++) {
-// 		g->edges[i].me = 0;
-// 		g->edges[i].you = 0;
-// 		g->edges[i].love = INF;
-// 	}
-// }
-// // 간선 삽입 연산
-// void insert_edge(GraphType* g, int start, int end, float w)
-// {
-// 	g->edges[g->n].me = start;
-// 	g->edges[g->n].you = end;
-// 	g->edges[g->n].love = w;
-// 	g->n++;
-//     printf("edge 추가 : [%d] <---[%f]---> [%d]\n", g->edges[g->n].me, g->edges[g->n].love, g->edges[g->n].you);
-// }
-// // qsort()에 사용되는 함수
-// int compare(const void* a, const void* b)
-// {
-// 	struct Data* x = (struct Data*)a;
-// 	struct Data* y = (struct Data*)b;
-// 	return (x->love - y->love);
-// }
-// // kruskal의 최소 비용 신장 트리 프로그램
-// void kruskal(GraphType *g)
-// {
-// 	int edge_accepted = 0;	// 현재까지 선택된 간선의 수	
-// 	int uset, vset;			// 정점 u와 정점 v의 집합 번호
-// 	struct Data e;
-// 	set_init(g->n);				// 집합 초기화
-//     int n = sizeof(e) / sizeof(e[0]);
-// 	heapSort(e, n)
-// 	printf("크루스칼 최소 신장 트리 알고리즘 \n");
-// 	int i = 0;
-// 	while (edge_accepted < (g->n - 1))	// 간선의 수 < (n-1)
-// 	{
-// 		e = g->edges[i];
-// 		uset = set_find(e.me);		// 정점 u의 집합 번호 
-// 		vset = set_find(e.you);		// 정점 v의 집합 번호
-// 		if (uset != vset) {			// 서로 속한 집합이 다르면
-// 			printf("[%d] 간선 (%d,%d) %f 선택\n", i, e.me, e.you, e.love);
-// 			edge_accepted++;
-// 			set_union(uset, vset);	// 두개의 집합을 합친다.
-// 		}
-// 		i++;
-// 	}
-// }
+int parent[MAX_VERTICES];		// 부모 노드
+// 초기화
+void set_init(int n)
+{
+	for (int i = 0; i<n; i++) 
+		parent[i] = -1;
+}
+// curr가 속하는 집합을 반환한다.
+int set_find(int curr)
+{
+	if (parent[curr] == -1)
+		return curr; 			// 루트 
+	while (parent[curr] != -1) curr = parent[curr];
+	return curr;
+}
+// 두개의 원소가 속한 집합을 합친다.
+void set_union(int a, int b)
+{
+	int root1 = set_find(a);	// 노드 a의 루트를 찾는다. 
+	int root2 = set_find(b);	// 노드 b의 루트를 찾는다. 
+	if (root1 != root2) 	// 합한다. 
+		parent[root1] = root2;
+}
+
+// 그래프 초기화 
+void graph_init(GraphType_* g)
+{
+	g->n = 0;
+	for (int i = 0; i < 2 * MAX_VERTICES; i++) {
+		g->edges[i].me = 0;
+		g->edges[i].you = 0;
+		g->edges[i].love = 11.0;
+	}
+}
+// 간선 삽입 연산
+void insert_edge(GraphType_* g, int start, int end, float w)
+{
+	g->edges[g->n].me = start;
+	g->edges[g->n].you = end;
+	g->edges[g->n].love = w;
+	g->n++;
+    if(g->edges[g->n].love != 0 && (g->edges[g->n].me != 0 || g->edges[g->n].you != 0))
+        printf("edge 추가 : [%d] <---[%f]---> [%d]\n", g->edges[g->n].me, g->edges[g->n].love, g->edges[g->n].you);
+}
+// qsort()에 사용되는 함수
+int compare(const void* a, const void* b)
+{
+	struct Edge* x = (struct Edge*)a;
+	struct Edge* y = (struct Edge*)b;
+	return (x->love - y->love);
+}
+// kruskal의 최소 비용 신장 트리 프로그램
+void kruskal(GraphType_ *g)
+{
+	int edge_accepted = 0;	// 현재까지 선택된 간선의 수	
+	int uset, vset;			// 정점 u와 정점 v의 집합 번호
+	struct Edge e;
+	
+	set_init(g->n);				// 집합 초기화
+    int n = sizeof(g->edges) / sizeof(g->edges[0]);
+	heapSort(g->edges, n);
+	printf("크루스칼 최소 신장 트리 알고리즘 \n");
+	int i = 0;
+	while (edge_accepted < (g->n - 1))	// 간선의 수 < (n-1)
+	{
+		e = g->edges[i];
+		uset = set_find(e.me);		// 정점 u의 집합 번호 
+		vset = set_find(e.you);		// 정점 v의 집합 번호
+		if (uset != vset) {			// 서로 속한 집합이 다르면
+			printf("[%d] 간선 (%d,%d) %f 선택\n", i, e.me, e.you, e.love);
+			edge_accepted++;
+			set_union(uset, vset);	// 두개의 집합을 합친다.
+		}
+		i++;
+	}
+}
+
 //////////////////////////////// Kruskal (끝) //////////////////////////////
 
 //////////////////////////////// FILE 저장 및 친밀도 계산 (시작) //////////////////////////////
@@ -447,10 +451,6 @@ void read_data_to_struct(Data *data) {
     while (fgets(buf, 30, fp) != NULL) {
         // 각 행의 데이터를 구조체에 저장
         sscanf(buf, "%d %d %f", &data[i].me, &data[i].you, &data[i].love);
-        // printf("me: %d, you: %d, love: %f ", data[i].me, data[i].you, data[i].love);
-        // if(i % 2 == 0){
-        //     printf("\n");
-        // }
         i++;
     }
     printf("FILE legth: [%d]\n", i);
@@ -469,23 +469,25 @@ int main(void){
     calculate_love(data);
 
     // print_data(data);
+    
     /////// 100개 노드 그래프 생성 시작 ///////
-    GraphType *g = (GraphType*)malloc(sizeof(GraphType));
-    init_graph(g);
+    GraphType_ *g = (GraphType_*)malloc(sizeof(GraphType_));
 
-    for(int i = 0; i < MAX_VERTICES; i++){
-        insert_graph_vertex(g, i);
-    }
-    printf("정점 삽입 완료 : %d 개\n", g->n);
-    for(int i = 0; i < FILE_LEN; i++){
-        insert_graph_edge(g, data[i].me, data[i].you);
-    }
-    printf("간선 삽입 완료\n");
-    print_adj_list(g);
-    /////// 100개 노드 그래프 생성 끝 ///////
+    graph_init(g);
 
     // for(int i = 0; i < MAX_VERTICES; i++){
-    bfs_list(g, 1);
+    //     insert_graph_vertex(g, i);
+    // }
+    for(int i = 0; i < FILE_LEN; i++){
+        insert_edge(g, data[i].me, data[i].you, data[i].love);
+    }
+    printf("정점 삽입 완료 : %d 개\n", g->n);
+    printf("간선 삽입 완료\n");
+    // print_adj_list(g);
+    /////// 100개 노드 그래프 생성 끝 ///////
+    kruskal(g);
+    // for(int i = 0; i < MAX_VERTICES; i++){
+    
     // }
 
     return 0;
