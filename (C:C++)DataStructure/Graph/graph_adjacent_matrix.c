@@ -104,7 +104,7 @@ typedef struct GraphNode{
 
 typedef struct GraphType {
     int n; // 정점의 개수
-    GraphNode* adj_list[MAX_VERTICES]; // 인접 리스트 - 각 연결리스트의 첫번째 번호 저장.
+    GraphNode* adj_list[MAX_VERTICES]; // 인접 리스트 - 각 연결리스트의 첫번째 번호 저장. -> 포인터의 배열
 }GraphType;
 
 // 그래프 초기화
@@ -138,6 +138,7 @@ void insert_edge(GraphType* g, int u, int v){
     }
     node = (GraphNode*)malloc(sizeof(GraphNode));
     node->vertex = v;
+    // 아래 두 줄은 리스트의 처음에 노드가 insert 되는 과정.
     node->link = g->adj_list[u];
     g->adj_list[u] = node;
 }
@@ -177,6 +178,8 @@ int main(void){
     for(int i = 0; i < 4; i++){
         insert_vertex(g, i);
     }
+
+    // 무방향 그래프일때에 간선의 앞뒤 순서를 바꾸어 두 경우 다 삽입해주어야함.
     insert_edge(g, 0 ,1);
     insert_edge(g, 1 ,0);
     insert_edge(g, 0 ,2);
@@ -191,6 +194,8 @@ int main(void){
     printf("깊이 우선 탐색 - 인접 리스트 사용\n");
     dfs_list(g, 3);
     printf("탐색 끝\n");
+    // node insert 과정에서도 각 노드에 동적할당을 한다.
+    // 따라서 각 리스트에 대해서도 free 를 해주어야한다.
     free(g);
     return 0;
 }
