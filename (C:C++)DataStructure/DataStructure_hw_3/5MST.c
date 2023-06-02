@@ -409,8 +409,38 @@ int compare(const void* a, const void* b)
 	struct Edge* y = (struct Edge*)b;
 	return (x->love - y->love);
 }
+// // kruskal의 최소 비용 신장 트리 프로그램
+// void kruskal(GraphType_ *g)
+// {
+// 	int edge_accepted = 0;	// 현재까지 선택된 간선의 수	
+// 	int uset, vset;			// 정점 u와 정점 v의 집합 번호
+// 	struct Edge e;
+	
+// 	set_init(g->n);				// 집합 초기화
+//     int n = sizeof(g->edges) / sizeof(g->edges[0]);
+
+// 	heapSort(g->edges, n);
+	
+//     printf("크루스칼 최소 신장 트리 알고리즘 \n");
+// 	int i = 0;
+
+// 	while (edge_accepted < MAX_VERTICES - 1)	// 간선의 수 < (n-1)
+// 	{
+// 		e = g->edges[i];
+// 		uset = set_find(e.me);		// 정점 u의 집합 번호 
+// 		vset = set_find(e.you);		// 정점 v의 집합 번호
+// 		if (uset != vset) {			// 서로 속한 집합이 다르면
+// 			printf("[%d] 간선 (%d,%d) %f 선택", i, e.me, e.you, e.love);
+// 			edge_accepted++;
+//             printf("[%d]\n", edge_accepted);
+// 			set_union(uset, vset);	// 두개의 집합을 합친다.
+// 		}
+// 		i++;
+// 	}
+// }
+
 // kruskal의 최소 비용 신장 트리 프로그램
-void kruskal(GraphType_ *g)
+void kruskal_return_arr(GraphType_ *g, Edge d_edge[])
 {
 	int edge_accepted = 0;	// 현재까지 선택된 간선의 수	
 	int uset, vset;			// 정점 u와 정점 v의 집합 번호
@@ -418,10 +448,12 @@ void kruskal(GraphType_ *g)
 	
 	set_init(g->n);				// 집합 초기화
     int n = sizeof(g->edges) / sizeof(g->edges[0]);
-	heapSort(g->edges, n);
-	printf("크루스칼 최소 신장 트리 알고리즘 \n");
-	int i = 0;
 
+	heapSort(g->edges, n);
+	
+    printf("크루스칼 최소 신장 트리 알고리즘 \n");
+	int i = 0;
+    int E_num = 0;
 	while (edge_accepted < MAX_VERTICES - 1)	// 간선의 수 < (n-1)
 	{
 		e = g->edges[i];
@@ -429,6 +461,11 @@ void kruskal(GraphType_ *g)
 		vset = set_find(e.you);		// 정점 v의 집합 번호
 		if (uset != vset) {			// 서로 속한 집합이 다르면
 			printf("[%d] 간선 (%d,%d) %f 선택", i, e.me, e.you, e.love);
+            // 큰 가중치를 가진 4개의 간선을 찾아 인자로 받은 d_edge배열에 저장.
+            if(e.love >= 10 && E_num < 4){
+                d_edge[E_num] = e;
+                E_num++;
+            }
 			edge_accepted++;
             printf("[%d]\n", edge_accepted);
 			set_union(uset, vset);	// 두개의 집합을 합친다.
@@ -436,6 +473,51 @@ void kruskal(GraphType_ *g)
 		i++;
 	}
 }
+
+//이렇게 하면 안됨. 간선이 아직 전부 추가되지 않아서 크루스칼이기 때문에 그래프가 완성 되어있지 않아서
+//간선 삭제 한다고 이전 까지의 노드와 간선들이 하나의 그래프가 되는 것이 아님..
+// void Grouping(GraphType_ group, int me, int you, float love){
+//     insert_edge(&group, me, you, love);
+// }
+// void kruskal_grouping(GraphType_ *g, GraphType_ group[]){
+// 	int edge_accepted = 0;	// 현재까지 선택된 간선의 수	
+// 	int uset, vset;			// 정점 u와 정점 v의 집합 번호
+// 	struct Edge e;
+// 	set_init(g->n);				// 집합 초기화
+//     int n = sizeof(g->edges) / sizeof(g->edges[0]);
+// 	heapSort(g->edges, n);
+//     printf("크루스칼 최소 신장 트리 알고리즘 \n");
+// 	int i = 0;
+//     int group_num = 0;
+// 	while (edge_accepted < MAX_VERTICES - 1)	// 간선의 수 < (n-1)
+// 	{
+// 		e = g->edges[i];
+// 		uset = set_find(e.me);		// 정점 u의 집합 번호 
+// 		vset = set_find(e.you);		// 정점 v의 집합 번호
+// 		if (uset != vset) {			// 서로 속한 집합이 다르면
+//             // 마지막 그룹이면 어떤 조건에 해당되지 않고 전부 그룹에 추가. (최대 그룹이 5개이므로 간선 삭제 하면 안됨.)
+//             if (group_num == 4){
+//                 printf("[%d] 간선 (%d,%d) %f 선택", i, e.me, e.you, e.love);
+//                 Grouping(group[group_num], e.me, e.you, e.love); // GraphType_ group[5] 배열의 요소인 그래프에 가중치가 10보다 작을 시 간선 추가.
+//                 edge_accepted++;
+//                 printf("[%d]\n", edge_accepted);
+//                 set_union(uset, vset);	// 두개의 집합을 합친다.
+//             }
+//             // 마지막 그룹이 아니고, 가중치가 10보다 작다면 그룹에 추가.
+//             else if(e.love < 10){             
+//                 printf("[%d] 간선 (%d,%d) %f 선택", i, e.me, e.you, e.love);
+//                 Grouping(group[group_num], e.me, e.you, e.love); // GraphType_ group[5] 배열의 요소인 그래프에 가중치가 10보다 작을 시 간선 추가.
+//                 edge_accepted++;
+//                 printf("[%d]\n", edge_accepted);
+//                 set_union(uset, vset);	// 두개의 집합을 합친다.
+//             }else{
+//                 printf("[%d] 간선[%d-[%f]-%d]의 가중치가 10보다 크므로 간선 삭제하여 그룹핑 합니다.\n", i, e.me, e.love ,e.you);
+//                 group_num++; // 간선의 가중치가 10보다 같거나 클 시 간선 삽입을 하지 않고 다음 그래프로 그룹핑.
+//             }
+// 		}
+// 		i++;
+// 	}
+// }
 
 //////////////////////////////// Kruskal (끝) //////////////////////////////
 
@@ -463,6 +545,10 @@ void read_data_to_struct(Data *data) {
 
 //////////////////////////////// FILE 저장 및 친밀도 계산 (끝) //////////////////////////////
 
+
+// 1. 크루스칼로 전체 MST를 찾고, 가장 큰 가중치를 가진 간선 4개와 해당 노드를 크루스칼 알고리즘에서 메인함수의 배열에 전달.
+// 2. K_graph의 edge에서 첫번째 간선을 삭제. -> 간선을 잇던 두 노드를 기준으로 prim 알고리즘.
+// 3. 두 그래프에서 다음 간선을 찾는다. -> 찾으면 과정2 반복.
 int main(void){
     // HeapType *h = create();
     Data data[FILE_LEN];
@@ -488,10 +574,13 @@ int main(void){
     printf("간선 삽입 완료\n");
     // print_adj_list(g);
     /////// 100개 노드 그래프 생성 끝 ///////
-    kruskal(g);
-    // for(int i = 0; i < MAX_VERTICES; i++){
+
+    Edge to_delete[4];
     
-    // }
+    kruskal_return_arr(g, to_delete);
+    for(int i = 0; i < 4; i++){
+        printf("i = [%d] / [%d ---[%f]--- %d]\n", i, to_delete[i].me, to_delete[i].love, to_delete[i].you);
+    }
 
     return 0;
 }
