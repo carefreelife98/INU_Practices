@@ -450,9 +450,42 @@ void kruskal_return_arr(GraphType_ *g, Edge final[])
 	int edge_accepted = 0;	// 현재까지 선택된 간선의 수	
 	int uset, vset;			// 정점 u와 정점 v의 집합 번호
 	struct Edge e;
-	set_init(g->n);				// 집합 초기화
+	
+    set_init(g->n);				// 집합 초기화
+    
     int n = sizeof(g->edges) / sizeof(g->edges[0]);
 	heapSort(g->edges, n);
+
+    printf("크루스칼 최소 신장 트리 알고리즘 \n");
+	int i = 0;
+    int E_num = 0;
+	while (edge_accepted < MAX_VERTICES - 1)	// 간선의 수 < (n-1)
+	{
+		e = g->edges[i];
+		uset = set_find(e.me);		// 정점 u의 집합 번호 
+		vset = set_find(e.you);		// 정점 v의 집합 번호
+		if (uset != vset) {			// 서로 속한 집합이 다르면
+			// printf("[%d] 간선 (%d,%d) %f 선택 ", i, e.me, e.you, e.love);
+            final[edge_accepted] = g->edges[i];
+            printf("final[%d] 그래프 추가 최종 간선: me:[%d] you:[%d] love:[%f] ", edge_accepted, final[edge_accepted].me, final[edge_accepted].you, final[edge_accepted].love);
+			edge_accepted++;
+            printf("[%d]\n", edge_accepted);
+			set_union(uset, vset);	// 두개의 집합을 합친다.
+		}
+		i++;
+	}
+}
+void kruskal_return_arr_test(GraphType_ *g, Edge final[])
+{
+	int edge_accepted = 0;	// 현재까지 선택된 간선의 수	
+	int uset, vset;			// 정점 u와 정점 v의 집합 번호
+	struct Edge e;
+	
+    set_init(g->n);				// 집합 초기화
+    
+    int n = sizeof(g->edges) / sizeof(g->edges[0]);
+	heapSort(g->edges, n);
+
     printf("크루스칼 최소 신장 트리 알고리즘 \n");
 	int i = 0;
     int E_num = 0;
@@ -617,6 +650,7 @@ void deleteNode(GraphType* graph, int vertex) {
 
 
 //////////////////////////////// test //////////////////////////////
+int groupAssignment[100];
 // Function to compare edges based on their weights (used for sorting)
 int compareEdges(const void* a, const void* b) {
     struct Edge* edgeA = (struct Edge*)a;
@@ -625,16 +659,17 @@ int compareEdges(const void* a, const void* b) {
 }
 
 // Function to find the parent of a vertex
-int findParent(int* parent, int vertex) {
+int findParent(int vertex) {
     if (parent[vertex] == -1)
         return vertex;
-    return findParent(parent, parent[vertex]);
+    while(parent[vertex] != -1) vertex = parent[vertex];
+    return vertex;
 }
 
 // Function to perform union of two sets
 void unionSets(int* parent, int x, int y) {
-    int parentX = findParent(parent, x);
-    int parentY = findParent(parent, y);
+    int parentX = findParent(x);
+    int parentY = findParent(y);
     parent[parentX] = parentY;
 }
 
@@ -645,31 +680,30 @@ void divideIntoGroups(Edge edges[], int numEdges, int numVertices) {
     
     // heapSort(edges, 99);
     // Create an array to keep track of the group assignment for each vertex
-    int* groupAssignment = (int*)malloc(numVertices * sizeof(int));
+    
     for (int i = 0; i < numVertices; i++) {
         groupAssignment[i] = -1; // Initialize group assignment to -1 (no group)
     }
     printf("groupwassign\n");
 
     // Create an array to store the 5 groups
-    int** groups = (int**)malloc(5 * sizeof(int*));
-    for (int i = 0; i < 5; i++) {
-        groups[i] = (int*)malloc(numVertices * sizeof(int));
-    }
+    int groups[5];
+    int parentStart;
+    int parentEnd;
     printf("Create an array\n");
     // Iterate through the sorted edges
     for (int i = 0; i < numEdges; i++) {
         struct Edge currentEdge = edges[i];
-        printf("Iterate\n");
+        printf("Edge: [%d] [%f] [%d]\n", edges[i].me, edges[i].love, edges[i].you);
         // Check if adding the edge creates a cycle in the current groups
-        int parentStart = findParent(groupAssignment, currentEdge.me);
-        int parentEnd = findParent(groupAssignment, currentEdge.you);
+        parentStart = findParent(currentEdge.me);
+        parentEnd = findParent(currentEdge.you);
         if (parentStart == parentEnd)
             continue; // Skip the edge
-
+        printf("sdadasda");
         // Add the edge and its vertices to one of the groups with the lowest cumulative weight
         int groupIndex = -1;
-        float minWeight = INT32_MAX;
+        float minWeight = 2174583.0;
         for (int j = 0; j < 5; j++) {
             float cumulativeWeight = 0;
             for (int k = 0; k < numVertices; k++) {
@@ -685,12 +719,12 @@ void divideIntoGroups(Edge edges[], int numEdges, int numVertices) {
         groupAssignment[currentEdge.you] = groupIndex;
         printf("finish\n");
     }
-
+    printf("hi");
     // Assign remaining vertices to the groups with the lowest cumulative weight
     for (int i = 0; i < numVertices; i++) {
         if (groupAssignment[i] == -1) {
             int groupIndex = -1;
-            float minWeight = INT32_MAX;
+            float minWeight = 2174583.0;
             for (int j = 0; j < 5; j++) {
                 float cumulativeWeight = 0;
                 for (int k = 0; k < numVertices; k++) {
@@ -715,13 +749,6 @@ void divideIntoGroups(Edge edges[], int numEdges, int numVertices) {
         }
         printf("\n");
     }
-
-    // Free dynamically allocated memory
-    free(groupAssignment);
-    for (int i = 0; i < 5; i++) {
-        free(groups[i]);
-    }
-    free(groups);
 }
 
 //////////////////////////////// test //////////////////////////////
