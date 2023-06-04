@@ -680,35 +680,41 @@ void divideIntoGroups(Edge edges[], int numEdges, int numVertices) {
     
     // heapSort(edges, 99);
     // Create an array to keep track of the group assignment for each vertex
-    
+    // 각 정점의 그룹 할당 여부를 담은 배열 생성 및 -1로 초기화. (-1 : 그룹 할당 되지 않음)
     for (int i = 0; i < numVertices; i++) {
         groupAssignment[i] = -1; // Initialize group assignment to -1 (no group)
     }
-    printf("groupwassign\n");
-
-    // Create an array to store the 5 groups
+    
+    // 5개의 그룹을 저장하기 위한 배열 group 생성.
     int groups[5];
+    printf("그룹 배열 생성 및 초기화 완료\n");
+
     int parentStart;
     int parentEnd;
-    printf("Create an array\n");
-    // Iterate through the sorted edges
+    
+    // love(가중치)를 기준으로 오름차순 정렬된 edge를 순회.
     for (int i = 0; i < numEdges; i++) {
+        
+        //edge 하나를 매개변수로 받은 edges 배열에서 꺼낸다.
         struct Edge currentEdge = edges[i];
         printf("Edge: [%d] [%f] [%d]\n", edges[i].me, edges[i].love, edges[i].you);
-        // Check if adding the edge creates a cycle in the current groups
+
+        // edge 가 cycle을 생성하게 되는지 parent 배열을 사용하여 검사.
+        // cycle을 생성한다면 continue 하여 그룹에 포함시키지 않고 다음 edge를 탐색한다.
         parentStart = findParent(currentEdge.me);
         parentEnd = findParent(currentEdge.you);
         if (parentStart == parentEnd)
-            continue; // Skip the edge
-        printf("sdadasda");
-        // Add the edge and its vertices to one of the groups with the lowest cumulative weight
+            continue;
+
+        // 그룹 중 가장 낮은 가중치가 쌓인 그룹에 현재 간선을 추가한다.
         int groupIndex = -1;
         float minWeight = 2174583.0;
-        for (int j = 0; j < 5; j++) {
+        
+        for (int j = 0; j < 5; j++) {   // 그룹 number (1,2,3,4,5)
             float cumulativeWeight = 0;
-            for (int k = 0; k < numVertices; k++) {
-                if (groupAssignment[k] == j)
-                    cumulativeWeight += edges[k].love;
+            for (int k = 0; k < numVertices; k++) { // 각 정점(0~99)의 그룹 할당 여부 확인을 groupAssignment[100] 배열을 통해 검사.
+                if (groupAssignment[k] == j)    // 만약 정점 k 가 그룹 j에 할당되어 있으면, 
+                    cumulativeWeight += edges[k].love;  // 정점 k의 간선 가중치를 cumulative weight 에 추가.
             }
             if (cumulativeWeight < minWeight) {
                 minWeight = cumulativeWeight;
@@ -719,8 +725,8 @@ void divideIntoGroups(Edge edges[], int numEdges, int numVertices) {
         groupAssignment[currentEdge.you] = groupIndex;
         printf("finish\n");
     }
-    printf("hi");
-    // Assign remaining vertices to the groups with the lowest cumulative weight
+
+    // 아직 그룹에 할당 되지 않은 정점이 있으면 가장 낮은 가중치를 가진 그룹에 추가.
     for (int i = 0; i < numVertices; i++) {
         if (groupAssignment[i] == -1) {
             int groupIndex = -1;
