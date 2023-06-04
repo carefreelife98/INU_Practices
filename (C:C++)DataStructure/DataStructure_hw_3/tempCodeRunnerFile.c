@@ -1,4 +1,8 @@
-if(index == 49){
-                    //     printf("그룹[%d]에 인원이 꽉 찼으므로 종료합니다: [%d]명\n", group_num, index + 1);
-                    //     return;
-                    // }
+for (int i = 0; i < NUM_GRAPHS; i++) {
+        graphs[i] = malloc(sizeof(Graph));
+        graphs[i]->numVertices = 0;
+        for (int j = 0; j < NUM_VERTICES; j++) {
+            graphs[i]->vertices[j] = 0;
+        }
+    }
+    printf("ok2");

@@ -77,9 +77,9 @@ void calculate_love(Data* data){
     printf("total = [%d]\n", total);
 }
 
-void mergeGraphs(Graph* graph1, Graph* graph2) {
-    for (int i = 0; i < graph2->numVertices; i++) {
-        graph1->vertices[graph1->numVertices++] = graph2->vertices[i];
+void mergeGraphs(Graph* graphs, int graphIndex1, int graphIndex2) {
+    for (int i = 0; i < graphs[graphIndex2].numVertices; i++) {
+        graphs[graphIndex1].vertices[graphs[graphIndex1].numVertices++] = graphs[graphIndex2].vertices[i];
     }
 }
 
@@ -89,43 +89,47 @@ int compareWeights(const void* a, const void* b) {
     return edgeA->weight - edgeB->weight;
 }
 
-void divideEdgesIntoGraphs(Edge* edges, int numEdges, Graph** graphs) {
+void divideEdgesIntoGraphs(Edge* edges, int numEdges, Graph* graphs) {
     qsort(edges, numEdges, sizeof(Edge), compareWeights);
-
+    printf("sort 성공\n");
+    // 정렬된 edges 배열의 각 간선을 순회.
     for (int i = 0; i < numEdges; i++) {
+
+        // edge 하나 꺼낸다.
         Edge edge = edges[i];
+        // 현재 간선이 할당될 그래프 넘버.
         int graphIndex = -1;
 
+        // graphs 배열의 각 그래프 순회
         for (int j = 0; j < NUM_GRAPHS; j++) {
-            if (graphs[j]->vertices[edge.v1] == 1 || graphs[j]->vertices[edge.v2] == 1) {
+            if (graphs[j].vertices[edge.v1] == 1 || graphs[j].vertices[edge.v2] == 1) {
                 if (graphIndex == -1) {
                     graphIndex = j;
                 } else if (graphIndex != j) {
-                    mergeGraphs(graphs[graphIndex], graphs[j]);
-                    graphs[j]->numVertices = 0; // Reset the merged graph
+                    mergeGraphs(graphs, graphIndex, j);
+                    graphs[j].numVertices = 0; // Reset the merged graph
                 }
             }
         }
-
         if (graphIndex == -1) {
             for (int j = 0; j < NUM_GRAPHS; j++) {
-                if (graphs[j]->numVertices == 0) {
+                if (graphs[j].numVertices == 0) {
                     graphIndex = j;
                     break;
                 }
             }
         }
 
-        graphs[graphIndex]->vertices[edge.v1] = 1;
-        graphs[graphIndex]->vertices[edge.v2] = 1;
-        graphs[graphIndex]->numVertices += 2;
+        graphs[graphIndex].vertices[edge.v1] = 1;
+        graphs[graphIndex].vertices[edge.v2] = 1;
+        graphs[graphIndex].numVertices += 2;
     }
 }
 
 int main() {
     Data data[FILE_LEN];
 
-    Edge edges[959]; // Adjust the array size based on your actual number of edges
+    Edge edges[FILE_LEN]; // Adjust the array size based on your actual number of edges
     
     read_data_to_struct(data);
     
@@ -140,32 +144,26 @@ int main() {
         printf("%d %f %d\n", edges[i].v1, edges[i].weight, edges[i].v2);
     }
 
-    Graph* graphs[NUM_GRAPHS];
-    printf("ok");
+
+    Graph graphs[NUM_GRAPHS];
     for (int i = 0; i < NUM_GRAPHS; i++) {
-        graphs[i] = malloc(sizeof(Graph));
-        graphs[i]->numVertices = 0;
+        graphs[i].numVertices = 0;
         for (int j = 0; j < NUM_VERTICES; j++) {
-            graphs[i]->vertices[j] = 0;
+            graphs[i].vertices[j] = 0;
         }
     }
-    printf("ok2");
-    divideEdgesIntoGraphs(edges, 959, graphs);
+
+    divideEdgesIntoGraphs(edges, FILE_LEN, graphs);
 
     // Print the resulting graphs
     for (int i = 0; i < NUM_GRAPHS; i++) {
         printf("Graph %d: ", i + 1);
         for (int j = 0; j < NUM_VERTICES; j++) {
-            if (graphs[i]->vertices[j] == 1) {
+            if (graphs[i].vertices[j] == 1) {
                 printf("%d ", j);
             }
         }
         printf("\n");
-    }
-
-    // Free allocated memory
-    for (int i = 0; i < NUM_GRAPHS; i++) {
-        free(graphs[i]);
     }
 
     return 0;
