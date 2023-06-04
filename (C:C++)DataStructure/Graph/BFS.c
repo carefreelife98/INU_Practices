@@ -4,6 +4,7 @@
 #define TRUE 1
 #define FALSE 0
 #define MAX_QUEUE_SIZE 10
+#define MAX_VERTICES 50
 
 typedef int element;
 
@@ -52,7 +53,7 @@ element dequeue(QueueType *q){
     return q->queue[q->front];
 }
 
-#define MAX_VERTICES 50
+////////////////// 인접 행렬로 구현된 너비 우선 탐색 //////////////////
 
 typedef struct GraphType{
     int n;
@@ -120,8 +121,74 @@ void bfs_mat(GraphType* g, int v){
     free(q);
 }
 
+////////////////// 인접 리스트로 구현된 너비 우선 탐색 //////////////////
+
+typedef struct GraphNode {
+    int vertex;
+    struct GraphNode *link;
+}GraphNode;
+
+typedef struct GraphType_adj_list {
+    int n;
+    GraphNode *adj_list[MAX_VERTICES];
+}GraphType_adj_list;
+
+void init_graph_adj_list(GraphType_adj_list *g){
+    g->n = 0;
+    for(int i = 0; i < MAX_VERTICES; i++){
+        g->adj_list[i] = NULL;
+    }
+}
+
+void insert_vertex_adj_list(GraphType_adj_list *g){
+    if(((g->n) + 1) > MAX_VERTICES){
+        fprintf(stderr, "정점의 개수 초과\n");
+        return;
+    }
+    // 인접행렬로 구현된 BFS와 마찬가지로 정점의 삽입은 개수의 증가 뿐이다.
+    g->n++;
+}
+
+void insert_edge_adj_list(GraphType_adj_list *g, int u, int v){
+    GraphNode *node;
+    if(u >= g->n || v >= g->n){
+        fprintf(stderr, "정점의 번호가 정점의 개수와 불일치\n");
+        return;
+    }
+    node = (GraphNode*)malloc(sizeof(GraphNode));
+    node->vertex = v;
+    node->link = g->adj_list[u];
+    g->adj_list[u] = node;
+}
+
+void bfs_list(GraphType_adj_list* g, int v){
+    GraphNode *w = (GraphNode*)malloc(sizeof(GraphNode));
+    QueueType *q = (QueueType*)malloc(sizeof(QueueType));
+    
+    queue_init(q);    // 큐의 초기화
+    visited[v] = TRUE;  //  첫번째 정점 v 방문 표시
+    printf("%d 방문 -> ", v);
+    enqueue(q, v);  // 시작 정점을 큐에 삽입
+    while (!is_empty(q)){   // 큐가 소진 될 때까지 실행
+        v = dequeue(q);
+        // 정점의 인접 리스트 끝까지 탐색.
+        for(w = g->adj_list[v]; w; w = w->link){
+            // 정점의 인접 리스트 중 아직 방문하지 않은 정점이 있다면
+            if(!visited[w->vertex]){
+                visited[w->vertex] = TRUE;  // 해당 정점의 방문 표시
+                printf("%d 방문 -> ", w->vertex);
+                enqueue(q, w->vertex);  // 해당 정점을 큐에 삽입.
+            }
+        }
+    }
+    free(w);
+    free(q);
+}
+
 int main(void)
 {
+    /////// 인접 행렬로 구현한 BFS ///////
+
 	GraphType *g;
 	g = (GraphType *)malloc(sizeof(GraphType));
 	init_graph(g);
@@ -134,9 +201,32 @@ int main(void)
 	insert_edge(g, 4, 5);
 	insert_edge(g, 1, 5);
 
-	printf("너비 우선 탐색\n");
-	bfs_mat(g, 0);
-	printf("\n");
+    /////// 인접 리스트로 구현한 BFS ///////
+
+    GraphType_adj_list *g_adj_list 
+    = (GraphType_adj_list*)malloc(sizeof(GraphType_adj_list));
+
+    init_graph_adj_list(g_adj_list);
+
+	for (int i = 0; i<6; i++)
+		insert_vertex_adj_list(g_adj_list);
+	insert_edge_adj_list(g_adj_list, 0, 2);
+	insert_edge_adj_list(g_adj_list, 2, 1);
+	insert_edge_adj_list(g_adj_list, 2, 3);
+	insert_edge_adj_list(g_adj_list, 0, 4);
+	insert_edge_adj_list(g_adj_list, 4, 5);
+	insert_edge_adj_list(g_adj_list, 1, 5);
+
+	// printf("너비 우선 탐색 - 인접 행렬\n");
+	// bfs_mat(g, 0);
+	// printf("\n");
+
+	printf("너비 우선 탐색 - 인접 리스트\n");
+    bfs_list(g_adj_list, 0);
+    printf("\n");
+
 	free(g);
+    free(g_adj_list);
+
 	return 0;
 }
