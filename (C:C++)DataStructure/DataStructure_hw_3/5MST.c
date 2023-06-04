@@ -817,33 +817,33 @@ int main(void){
     
     kruskal_return_arr(g, final);
 
-    divideIntoGroups(final, 99, MAX_VERTICES);
+    // divideIntoGroups(final, 99, MAX_VERTICES);
     
     // for(int i = 0; i < 4; i++){
     //     printf("i = [%d] / [%d ---[%f]--- %d]\n", to_delete[i].index, to_delete[i].me, to_delete[i].love, to_delete[i].you);
     // }
-    ////// 삭제할 간선 4개 구조체 배열 및 해당 간선을 제외한 5개 그래프 전부의 최종 간선 구조체 배열 생성 끝 (g, to_delete[4]) ////// 
+    //// 삭제할 간선 4개 구조체 배열 및 해당 간선을 제외한 5개 그래프 전부의 최종 간선 구조체 배열 생성 끝 (g, to_delete[4]) ////// 
 
-    // int size_final = sizeof(final) / sizeof(final[0]);
+    int size_final = sizeof(final) / sizeof(final[0]);
 
     // printf("4개 간선의 삭제 후 현재 final 배열:\n");
-    // for (int i = 0; i < size_final; i++){
-    //     printf("i:[%d] idx:[%d] me:[%d] you:[%d] love:[%f] \n", i, final[i].index, final[i].me, final[i].you, final[i].love);
-    // }
+    for (int i = 0; i < size_final; i++){
+        printf("i:[%d] me:[%d] you:[%d] love:[%f] \n", i, final[i].me, final[i].you, final[i].love);
+    }
 
     
 
-    // // 인접리스트를 이용한 새로운 그래프 생성
-    // GraphType *graph;
-    // graph = (GraphType*)malloc(sizeof(GraphType));
-    // // 그래프 초기화
-    // init_graph(graph);
-    // printf("그래프 초기화\n");
-    // // 정점 추가
-    // for (int i = 0; i < 100; i++){
-    //     insert_graph_vertex(graph, i);
-    // }
-    // printf("vertex 추가\n");
+    // 인접리스트를 이용한 새로운 그래프 생성
+    GraphType *graph;
+    graph = (GraphType*)malloc(sizeof(GraphType));
+    // 그래프 초기화
+    init_graph(graph);
+    printf("그래프 초기화\n");
+    // 정점 추가
+    for (int i = 0; i < 100; i++){
+        insert_graph_vertex(graph, i);
+    }
+    printf("vertex 추가\n");
 
     // int size = sizeof(final) / sizeof(final[0]);
     // // 간선 추가
@@ -851,8 +851,14 @@ int main(void){
     //     insert_graph_edge(graph, final[i].me, final[i].you, final[i].love);
     //     insert_graph_edge(graph, final[i].you, final[i].me, final[i].love);
     // }
+    int size = sizeof(g->edges) / sizeof(g->edges[0]);
+    // 간선 추가
+    for(int i = 0; i < size; i++){
+        insert_graph_edge(graph, final[i].me, final[i].you, final[i].love);
+        insert_graph_edge(graph, final[i].you, final[i].me, final[i].love);
+    }
 
-    // print_adj_list(graph);
+    print_adj_list(graph);
 
     // int *top4Nodes = findTop4Nodes(graph);
     // printf("\n가장 많은 인접 노드를 가진 노드의 인덱스 (상위 4개):\n");
