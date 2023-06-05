@@ -92,7 +92,6 @@ void insert_edge(GraphType *g, int start, int end){
     // 인접 행렬으로 구현된 그래프이므로 양방향 전부 간선이 있음을 표시해 주어야 한다.
     g->adj_mat[start][end] = 1;
     g->adj_mat[end][start] = 1;
-    printf("%d %d\n", g->adj_mat[start][end], g->adj_mat[end][start]);
 }
 
 void bfs_mat(GraphType* g, int v){
