@@ -210,17 +210,17 @@ vertices* bfs_list(GraphType *g, int v, GraphType_ *MST){
     visited[v] = TRUE;
     insert_G_ver(&group_vertices[g_n], v);
 
-    printf("%d 방문 -> \n", v);
+    // printf("%d 방문 -> \n", v);
     enqueue(q, v);
     while (!is_empty(q)){
         v = dequeue(q);
-        printf("%d 에서 인접 노드 방문 시작: \n", v);
+        // printf("%d 에서 인접 노드 방문 시작: \n", v);
 
         for(w = g->adj_list[v]; w; w = w->link){
             if(!visited[w->vertex] && w->love <= 6.5){
                 visited[w->vertex] = TRUE;
 
-                printf("[love: %f] %d 방문 -> \n", w->love, w->vertex);
+                // printf("[love: %f] %d 방문 -> \n", w->love, w->vertex);
                 insert_G_ver(&group_vertices[g_n], w->vertex);
                 enqueue(q, w->vertex);
                 if(w != NULL){
@@ -367,19 +367,22 @@ void kruskal(GraphType_ *g, int n)
 	heapSort_(g->edges, n);
     printf("크루스칼 최소 신장 트리 알고리즘 \n");
 	int i = 0;
+    float sum = 0;
 	while (edge_accepted < n - 1)	// 간선의 수 < (n-1)
 	{
 		e = g->edges[i];
 		uset = set_find(e.me);		// 정점 u의 집합 번호 
 		vset = set_find(e.you);		// 정점 v의 집합 번호
 		if (uset != vset) {			// 서로 속한 집합이 다르면
-			printf("[%d] 간선 (%d,%d) %f 선택", i, e.me, e.you, e.love);
+			printf("간선 (%d,%d) %f 선택", e.me, e.you, e.love);
+            sum += e.love;
 			edge_accepted++;
             printf("[%d]\n", edge_accepted);
 			set_union(uset, vset);	// 두개의 집합을 합친다.
 		}
 		i++;
 	}
+    printf("MST의 전체 가중치: [%f]\n", sum);
 }
 
 //////////////////////////////// FILE 저장 및 친밀도 계산 (시작) //////////////////////////////
@@ -471,7 +474,7 @@ int main(void){
     for (int i = 0; i < 100; i++){
         insert_graph_vertex(graph, i);
     }
-    printf("vertex 추가\n");
+    // printf("vertex 추가\n");
 
     int size = sizeof(graph->adj_list) / sizeof(graph->adj_list[0]);
     // 간선 추가
