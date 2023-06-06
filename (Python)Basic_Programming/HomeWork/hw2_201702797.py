@@ -41,7 +41,6 @@ def calculate_num(list_str, n, rs):
         else:
             rs.append("0")
 
-
         # 결과를 역순으로 반환
         i = len(result) - 1
         while i >= 0:

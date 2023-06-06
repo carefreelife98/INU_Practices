@@ -845,17 +845,12 @@ int main(void){
     }
     printf("vertex 추가\n");
 
-    // int size = sizeof(final) / sizeof(final[0]);
-    // // 간선 추가
-    // for(int i = 0; i < size; i++){
-    //     insert_graph_edge(graph, final[i].me, final[i].you, final[i].love);
-    //     insert_graph_edge(graph, final[i].you, final[i].me, final[i].love);
-    // }
+    
     int size = sizeof(g->edges) / sizeof(g->edges[0]);
     // 간선 추가
     for(int i = 0; i < size; i++){
-        insert_graph_edge(graph, final[i].me, final[i].you, final[i].love);
-        insert_graph_edge(graph, final[i].you, final[i].me, final[i].love);
+        insert_graph_edge(graph, data[i].me, data[i].you, data[i].love);
+        insert_graph_edge(graph, data[i].you, data[i].me, data[i].love);
     }
 
     print_adj_list(graph);
