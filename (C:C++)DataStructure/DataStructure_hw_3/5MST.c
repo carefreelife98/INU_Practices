@@ -155,26 +155,26 @@ element dequeue(QueueType* q){
 #define TRUE 1
 #define FALSE 0
 
-// int visited[MAX_VERTICES];
-// void bfs_list(GraphType_* g, int v){
-//     Edge* w;
-//     QueueType* q;
+int visited[MAX_VERTICES];
+void bfs_list(GraphType *g, int v){
+    GraphNode* w;
+    QueueType* q = (QueueType*)malloc(sizeof(QueueType));
 
-//     queue_init(q);
-//     visited[v] = TRUE;
-//     printf("%d 방문 -> ", v);
-//     enqueue(q, v);
-//     while (!is_empty(q)){
-//         v = dequeue(q);
-//         for(w = &g->edges[v]; w; w= w->link){
-//             if(!visited[w->me]){
-//                 visited[w->me] = TRUE;
-//                 printf("%d 방문 -> ", w->me);
-//                 enqueue(q, w->me);
-//             }
-//         }
-//     }
-// }
+    queue_init(q);
+    visited[v] = TRUE;
+    printf("%d 방문 -> ", v);
+    enqueue(q, v);
+    while (!is_empty(q)){
+        v = dequeue(q);
+        for(w = g->adj_list[v]; w; w = w->link){
+            if(!visited[w->vertex]){
+                visited[w->vertex] = TRUE;
+                printf("%d 방문 -> ", w->vertex);
+                enqueue(q, w->vertex);
+            }
+        }
+    }
+}
 
 //////////////////////////////// 너비 우선 탐색 끝 //////////////////////////////
 
@@ -223,39 +223,39 @@ Edge delete_max_heap(HeapType_* h){
     return item;
 }
 
-void print_data(Edge* data){
-    printf("Data data[FILE_len] 출력\n");
-    for(int i = 0; i < FILE_LEN; i++){
-        printf("data[%d] me:[%d] you:[%d] love:[%f]\n", i, data[i].me, data[i].you, data[i].love);
-        // if(i % 3 == 0){
-        //     printf("\n");
-        // }
-    }
-}
+// void print_data(Edge* data){
+//     printf("Data data[FILE_len] 출력\n");
+//     for(int i = 0; i < FILE_LEN; i++){
+//         printf("data[%d] me:[%d] you:[%d] love:[%f]\n", i, data[i].me, data[i].you, data[i].love);
+//         // if(i % 3 == 0){
+//         //     printf("\n");
+//         // }
+//     }
+// }
 // 배열 요소를 교환하는 함수
-void swap(Edge* a, Edge* b) {
-    Edge temp = *a;
+void swap(GraphNode* a, GraphNode* b) {
+    GraphNode temp = *a;
     *a = *b;
     *b = temp;
 }
 
 // 최대 힙 구조를 유지하는 함수
-void heapify(Edge arr[], int n, int i) {
+void heapify(GraphNode* arr[], int n, int i) {
     int largest = i;    // 루트 노드
     int left = 2 * i + 1;    // 왼쪽 자식 노드
     int right = 2 * i + 2;    // 오른쪽 자식 노드
 
     // 왼쪽 자식과 비교
-    if (left < n && arr[left].love > arr[largest].love)
+    if (left < n && arr[left]->love > arr[largest]->love)
         largest = left;
 
     // 오른쪽 자식과 비교
-    if (right < n && arr[right].love > arr[largest].love)
+    if (right < n && arr[right]->love > arr[largest]->love)
         largest = right;
 
     // 루트 노드가 자식보다 작지 않다면 교환
     if (largest != i) {
-        swap(&arr[i], &arr[largest]);
+        swap(arr[i], arr[largest]);
 
         // 변경된 부분을 대상으로 다시 힙 구조 유지
         heapify(arr, n, largest);
@@ -263,7 +263,7 @@ void heapify(Edge arr[], int n, int i) {
 }
 
 // Heap Sort 함수
-void heapSort(Edge arr[], int n) {
+void heapSort(GraphNode *arr[MAX_VERTICES], int n) {
     // 초기 힙 구조 생성
     for (int i = n / 2 - 1; i >= 0; i--)
         heapify(arr, n, i);
@@ -271,12 +271,51 @@ void heapSort(Edge arr[], int n) {
     // 힙 구조에서 요소를 하나씩 제거하며 정렬
     for (int i = n - 1; i > 0; i--) {
         // 최대값(루트)을 배열의 마지막 요소와 교환
-        swap(&arr[0], &arr[i]);
+        swap(arr[0], arr[i]);
 
         // 힙 구조 유지
         heapify(arr, i, 0);
     }
 }
+// // 배열 요소를 교환하는 함수
+// void swap(Edge* a, Edge* b) {
+//     Edge temp = *a;
+//     *a = *b;
+//     *b = temp;
+// }
+
+// // 최대 힙 구조를 유지하는 함수
+// void heapify(Edge arr[], int n, int i) {
+//     int largest = i;    // 루트 노드
+//     int left = 2 * i + 1;    // 왼쪽 자식 노드
+//     int right = 2 * i + 2;    // 오른쪽 자식 노드
+//     // 왼쪽 자식과 비교
+//     if (left < n && arr[left].love > arr[largest].love)
+//         largest = left;
+//     // 오른쪽 자식과 비교
+//     if (right < n && arr[right].love > arr[largest].love)
+//         largest = right;
+//     // 루트 노드가 자식보다 작지 않다면 교환
+//     if (largest != i) {
+//         swap(&arr[i], &arr[largest]);
+//         // 변경된 부분을 대상으로 다시 힙 구조 유지
+//         heapify(arr, n, largest);
+//     }
+// }
+
+// // Heap Sort 함수
+// void heapSort(Edge arr[], int n) {
+//     // 초기 힙 구조 생성
+//     for (int i = n / 2 - 1; i >= 0; i--)
+//         heapify(arr, n, i);
+//     // 힙 구조에서 요소를 하나씩 제거하며 정렬
+//     for (int i = n - 1; i > 0; i--) {
+//         // 최대값(루트)을 배열의 마지막 요소와 교환
+//         swap(&arr[0], &arr[i]);
+//         // 힙 구조 유지
+//         heapify(arr, i, 0);
+//     }
+// }
 //////////////////////////////// priority queue (힙 정렬) 끝 //////////////////////////////
 
 //////////////////////////////// 친밀도 계산 시작 //////////////////////////////
@@ -361,7 +400,6 @@ void insert_edge(GraphType_* g, int start, int end, float w, int index)
 	g->edges[g->n].love = w;
     // g->edges[g->n].index = index;
 	g->n++; // 정점 개수 + 1
-
     // if(g->edges[g->n].love != 0 && (g->edges[g->n].me != 0 || g->edges[g->n].you != 0))
     // printf("edge 추가 : [%d] <---[%f]---> [%d]\n", g->edges[g->n].me, g->edges[g->n].love, g->edges[g->n].you);
 }
@@ -398,16 +436,16 @@ int compare(const void* a, const void* b)
 // 	}
 // }
 
-void delete_low_priority_edge(Edge edges[], int* size, int index) {
-    if (index < 0 || index >= *size) {
-        printf("유효하지 않은 인덱스입니다.\n");
-        return;
-    }
-    for (int i = index; i < *size - 1; i++) {
-        edges[i] = edges[i + 1];
-    }
-    (*size)--;
-}
+// void delete_low_priority_edge(Edge edges[], int* size, int index) {
+//     if (index < 0 || index >= *size) {
+//         printf("유효하지 않은 인덱스입니다.\n");
+//         return;
+//     }
+//     for (int i = index; i < *size - 1; i++) {
+//         edges[i] = edges[i + 1];
+//     }
+//     (*size)--;
+// }
 
 // kruskal의 최소 비용 신장 트리 프로그램
 // void kruskal_return_arr(GraphType_ *g, Edge final[], Edge d_edge[])
@@ -450,12 +488,9 @@ void kruskal_return_arr(GraphType_ *g, Edge final[])
 	int edge_accepted = 0;	// 현재까지 선택된 간선의 수	
 	int uset, vset;			// 정점 u와 정점 v의 집합 번호
 	struct Edge e;
-	
     set_init(g->n);				// 집합 초기화
-    
     int n = sizeof(g->edges) / sizeof(g->edges[0]);
-	heapSort(g->edges, n);
-
+	// heapSort(g->edges, n);
     printf("크루스칼 최소 신장 트리 알고리즘 \n");
 	int i = 0;
     int E_num = 0;
@@ -480,12 +515,9 @@ void kruskal_return_arr_test(GraphType_ *g, Edge final[])
 	int edge_accepted = 0;	// 현재까지 선택된 간선의 수	
 	int uset, vset;			// 정점 u와 정점 v의 집합 번호
 	struct Edge e;
-	
     set_init(g->n);				// 집합 초기화
-    
     int n = sizeof(g->edges) / sizeof(g->edges[0]);
-	heapSort(g->edges, n);
-
+	// heapSort(g->edges, n);
     printf("크루스칼 최소 신장 트리 알고리즘 \n");
 	int i = 0;
     int E_num = 0;
@@ -563,7 +595,6 @@ int* findTop4Nodes(GraphType* graph) {
             curr = curr->link;
         }
     }
-
     // 상위 5개 노드 인덱스를 찾기 위한 배열 생성
     int* top5Nodes = (int*)malloc(5 * sizeof(int));
     for (int i = 0; i < 4; i++) {
@@ -578,7 +609,6 @@ int* findTop4Nodes(GraphType* graph) {
         top5Nodes[i] = maxIndex;
         nodeCounts[maxIndex] = 0; // 이미 선택한 노드는 카운트를 0으로 설정하여 다음 최댓값을 찾을 때 제외
     }
-
     free(nodeCounts);
     return top5Nodes;
 }
@@ -590,13 +620,11 @@ void deleteNode(GraphType* graph, int vertex) {
         printf("유효하지 않은 노드입니다.\n");
         return;
     }
-
     // 인접 리스트에서 노드와 연결된 간선 삭제
     GraphNode* currNode = graph->adj_list[vertex];
     while (currNode != NULL) {
         int adjVertex = currNode->vertex;
         GraphNode* prevNode = graph->adj_list[adjVertex];
-
         // 첫 번째 노드인 경우
         if (prevNode->vertex == vertex) {
             graph->adj_list[adjVertex] = prevNode->link;
@@ -615,18 +643,15 @@ void deleteNode(GraphType* graph, int vertex) {
         }
         currNode = currNode->link;
     }
-
     // 인접 리스트에서 해당 노드 삭제
     GraphNode* deleteNode = graph->adj_list[vertex];
     graph->adj_list[vertex] = deleteNode->link;
     free(deleteNode);
-
     printf("노드 %d가 삭제되었습니다.\n", vertex);
 }
 // void delete_node(GraphType* g, int index){
 //     GraphType *temp = g;
 //     int max = 0;
-
 //     // 최대 가중치 노드 찾기
 //     while(temp->adj_list[index] != NULL){
 //         if(temp->adj_list[index]->love > max){
@@ -657,7 +682,6 @@ int compareEdges(const void* a, const void* b) {
     struct Edge* edgeB = (struct Edge*)b;
     return edgeA->love - edgeB->love;
 }
-
 // Function to find the parent of a vertex
 int findParent(int vertex) {
     if (parent[vertex] == -1)
@@ -665,19 +689,16 @@ int findParent(int vertex) {
     while(parent[vertex] != -1) vertex = parent[vertex];
     return vertex;
 }
-
 // Function to perform union of two sets
 void unionSets(int* parent, int x, int y) {
     int parentX = findParent(x);
     int parentY = findParent(y);
     parent[parentX] = parentY;
 }
-
 // Function to divide vertices into 5 groups with the lowest weight
 void divideIntoGroups(Edge edges[], int numEdges, int numVertices) {
     // Sort the edges in ascending order based on their weights
     // qsort(edges, numEdges, sizeof(struct Edge), compareEdges);
-    
     // heapSort(edges, 99);
     // Create an array to keep track of the group assignment for each vertex
     // 각 정점의 그룹 할당 여부를 담은 배열 생성 및 -1로 초기화. (-1 : 그룹 할당 되지 않음)
@@ -795,43 +816,29 @@ int main(void){
     calculate_love(data);
 
     /////// 100개 노드 그래프 생성 시작 ///////
-    GraphType_ *g = (GraphType_*)malloc(sizeof(GraphType_));
+    // GraphType_ *g = (GraphType_*)malloc(sizeof(GraphType_));
 
-    graph_init(g);
+    // graph_init(g);
 
-    for(int i = 0; i < FILE_LEN; i++){
-        insert_edge(g, data[i].me, data[i].you, data[i].love, i);
-    }
-    printf("정점 삽입 완료 : %d 개\n", g->n);
-    printf("간선 삽입 완료\n");
+    // for(int i = 0; i < FILE_LEN; i++){
+    //     insert_edge(g, data[i].me, data[i].you, data[i].love, i);
+    // }
+    // printf("정점 삽입 완료 : %d 개\n", g->n);
+    // printf("간선 삽입 완료\n");
 
     /////// 100개 노드 그래프 생성 끝 ///////
-    
-    // 삭제될 4개의 최대 가중치를 가진 간선 정보 저징.
-    // Edge to_delete[4];
 
     // 최종 그래프 5개의 간선 정보를 가진 구조체 배열. 노드가 100개이므로 간선은 99개.
-    Edge final[99];
-
-    // kruskal_return_arr(g, final, to_delete);
+    // Edge final[99];
     
-    kruskal_return_arr(g, final);
+    // kruskal_return_arr(g, final);
 
-    // divideIntoGroups(final, 99, MAX_VERTICES);
-    
-    // for(int i = 0; i < 4; i++){
-    //     printf("i = [%d] / [%d ---[%f]--- %d]\n", to_delete[i].index, to_delete[i].me, to_delete[i].love, to_delete[i].you);
+    // int size_final = sizeof(final) / sizeof(final[0]);
+
+    // // printf("4개 간선의 삭제 후 현재 final 배열:\n");
+    // for (int i = 0; i < size_final; i++){
+    //     printf("i:[%d] me:[%d] you:[%d] love:[%f] \n", i, final[i].me, final[i].you, final[i].love);
     // }
-    //// 삭제할 간선 4개 구조체 배열 및 해당 간선을 제외한 5개 그래프 전부의 최종 간선 구조체 배열 생성 끝 (g, to_delete[4]) ////// 
-
-    int size_final = sizeof(final) / sizeof(final[0]);
-
-    // printf("4개 간선의 삭제 후 현재 final 배열:\n");
-    for (int i = 0; i < size_final; i++){
-        printf("i:[%d] me:[%d] you:[%d] love:[%f] \n", i, final[i].me, final[i].you, final[i].love);
-    }
-
-    
 
     // 인접리스트를 이용한 새로운 그래프 생성
     GraphType *graph;
@@ -845,15 +852,27 @@ int main(void){
     }
     printf("vertex 추가\n");
 
-    
-    int size = sizeof(g->edges) / sizeof(g->edges[0]);
+    int size = sizeof(graph->adj_list) / sizeof(graph->adj_list[0]);
     // 간선 추가
-    for(int i = 0; i < size; i++){
+    for(int i = 0; i < FILE_LEN; i++){
         insert_graph_edge(graph, data[i].me, data[i].you, data[i].love);
         insert_graph_edge(graph, data[i].you, data[i].me, data[i].love);
     }
 
     print_adj_list(graph);
+
+    bfs_list(graph, 0);
+    // heapSort(graph->adj_list, size);
+
+    // printf("힙정렬 후 adj_list: \n");
+    // for(int i = 0; i < graph->n; i++){
+    //     GraphNode* temp = graph->adj_list[i];
+    //     while(temp != NULL){
+    //         printf(" [%d %f %d] -> ", i, temp->love, temp->vertex);
+    //         temp = temp->link;
+    //     }
+    //     printf("\n");
+    // }
 
     // int *top4Nodes = findTop4Nodes(graph);
     // printf("\n가장 많은 인접 노드를 가진 노드의 인덱스 (상위 4개):\n");
