@@ -41,7 +41,7 @@ typedef struct GraphType{
 
 typedef struct GraphType_ {
 	int n;	// 정점의 개수
-	struct Edge edges[2 * MAX_VERTICES];
+	struct Edge edges[FILE_LEN];
 } GraphType_;
 //////////////////////////////// 구조체, 정의 끝 //////////////////////////////
 
@@ -198,7 +198,16 @@ int check(){
     return -1;
 }
 
-vertices* bfs_list(GraphType *g, int v){
+void insert_mst_edge(GraphType_ *MST, int me, int you, float love){
+    if(MST != NULL){
+        MST->edges[MST->n].me = me;
+        MST->edges[MST->n].you = you;
+        MST->edges[MST->n].love = love;
+        MST->n++;
+    }
+}
+
+vertices* bfs_list(GraphType *g, int v, GraphType_ *MST){
     GraphNode* w;
     vertices* group_vertices = (vertices*)malloc(5 * sizeof(vertices));
     QueueType* q = (QueueType*)malloc(sizeof(QueueType));
@@ -222,7 +231,11 @@ vertices* bfs_list(GraphType *g, int v){
                 printf("[love: %f] %d 방문 -> \n", w->love, w->vertex);
                 insert_G_ver(&group_vertices[g_n], w->vertex);
                 enqueue(q, w->vertex);
-                if(group_vertices[g_n].n == 20){
+                if(w != NULL){
+                    insert_mst_edge(&MST[g_n], v, w->vertex, w->love);
+                }
+                
+                if(MST[g_n].n == 20){
                     g_n++;
                 }
             }
@@ -477,26 +490,18 @@ void set_union(int a, int b)
 		parent[root1] = root2;
 }
 
-
-// qsort()에 사용되는 함수
-int compare(const void* a, const void* b)
-{
-	struct Edge* x = (struct Edge*)a;
-	struct Edge* y = (struct Edge*)b;
-	return (x->love - y->love);
-}
 // kruskal의 최소 비용 신장 트리 프로그램
-void kruskal(GraphType_ *g)
+void kruskal(GraphType_ *g, int n)
 {
 	int edge_accepted = 0;	// 현재까지 선택된 간선의 수	
 	int uset, vset;			// 정점 u와 정점 v의 집합 번호
 	struct Edge e;
 	set_init(g->n);				// 집합 초기화
-    int n = sizeof(g->edges) / sizeof(g->edges[0]);
+    // int n = sizeof(g->edges) / sizeof(g->edges[0]);
 	heapSort_(g->edges, n);
     printf("크루스칼 최소 신장 트리 알고리즘 \n");
 	int i = 0;
-	while (edge_accepted < MAX_VERTICES - 1)	// 간선의 수 < (n-1)
+	while (edge_accepted < n - 1)	// 간선의 수 < (n-1)
 	{
 		e = g->edges[i];
 		uset = set_find(e.me);		// 정점 u의 집합 번호 
@@ -752,106 +757,98 @@ void deleteNode(GraphType* graph, int vertex) {
 //////////////////////////////// test //////////////////////////////
 int groupAssignment[100];
 // Function to compare edges based on their weights (used for sorting)
-int compareEdges(const void* a, const void* b) {
-    struct Edge* edgeA = (struct Edge*)a;
-    struct Edge* edgeB = (struct Edge*)b;
-    return edgeA->love - edgeB->love;
-}
-// Function to find the parent of a vertex
-int findParent(int vertex) {
-    if (parent[vertex] == -1)
-        return vertex;
-    while(parent[vertex] != -1) vertex = parent[vertex];
-    return vertex;
-}
-// Function to perform union of two sets
-void unionSets(int* parent, int x, int y) {
-    int parentX = findParent(x);
-    int parentY = findParent(y);
-    parent[parentX] = parentY;
-}
-// Function to divide vertices into 5 groups with the lowest weight
-void divideIntoGroups(Edge edges[], int numEdges, int numVertices) {
-    // Sort the edges in ascending order based on their weights
-    // qsort(edges, numEdges, sizeof(struct Edge), compareEdges);
-    // heapSort(edges, 99);
-    // Create an array to keep track of the group assignment for each vertex
-    // 각 정점의 그룹 할당 여부를 담은 배열 생성 및 -1로 초기화. (-1 : 그룹 할당 되지 않음)
-    for (int i = 0; i < numVertices; i++) {
-        groupAssignment[i] = -1; // Initialize group assignment to -1 (no group)
-    }
-    
-    // 5개의 그룹을 저장하기 위한 배열 group 생성.
-    int groups[5];
-    printf("그룹 배열 생성 및 초기화 완료\n");
+// int compareEdges(const void* a, const void* b) {
+//     struct Edge* edgeA = (struct Edge*)a;
+//     struct Edge* edgeB = (struct Edge*)b;
+//     return edgeA->love - edgeB->love;
+// }
+// // Function to find the parent of a vertex
+// int findParent(int vertex) {
+//     if (parent[vertex] == -1)
+//         return vertex;
+//     while(parent[vertex] != -1) vertex = parent[vertex];
+//     return vertex;
+// }
+// // Function to perform union of two sets
+// void unionSets(int* parent, int x, int y) {
+//     int parentX = findParent(x);
+//     int parentY = findParent(y);
+//     parent[parentX] = parentY;
+// }
 
-    int parentStart;
-    int parentEnd;
-    
-    // love(가중치)를 기준으로 오름차순 정렬된 edge를 순회.
-    for (int i = 0; i < numEdges; i++) {
-        
-        //edge 하나를 매개변수로 받은 edges 배열에서 꺼낸다.
-        struct Edge currentEdge = edges[i];
-        printf("Edge: [%d] [%f] [%d]\n", edges[i].me, edges[i].love, edges[i].you);
-
-        // edge 가 cycle을 생성하게 되는지 parent 배열을 사용하여 검사.
-        // cycle을 생성한다면 continue 하여 그룹에 포함시키지 않고 다음 edge를 탐색한다.
-        parentStart = findParent(currentEdge.me);
-        parentEnd = findParent(currentEdge.you);
-        if (parentStart == parentEnd)
-            continue;
-
-        // 그룹 중 가장 낮은 가중치가 쌓인 그룹에 현재 간선을 추가한다.
-        int groupIndex = -1;
-        float minWeight = 2174583.0;
-        
-        for (int j = 0; j < 5; j++) {   // 그룹 number (1,2,3,4,5)
-            float cumulativeWeight = 0;
-            for (int k = 0; k < numVertices; k++) { // 각 정점(0~99)의 그룹 할당 여부 확인을 groupAssignment[100] 배열을 통해 검사.
-                if (groupAssignment[k] == j)    // 만약 정점 k 가 그룹 j에 할당되어 있으면, 
-                    cumulativeWeight += edges[k].love;  // 정점 k의 간선 가중치를 cumulative weight 에 추가.
-            }
-            if (cumulativeWeight < minWeight) {
-                minWeight = cumulativeWeight;
-                groupIndex = j;
-            }
-        }
-        groupAssignment[currentEdge.me] = groupIndex;
-        groupAssignment[currentEdge.you] = groupIndex;
-        printf("finish\n");
-    }
-
-    // 아직 그룹에 할당 되지 않은 정점이 있으면 가장 낮은 가중치를 가진 그룹에 추가.
-    for (int i = 0; i < numVertices; i++) {
-        if (groupAssignment[i] == -1) {
-            int groupIndex = -1;
-            float minWeight = 2174583.0;
-            for (int j = 0; j < 5; j++) {
-                float cumulativeWeight = 0;
-                for (int k = 0; k < numVertices; k++) {
-                    if (groupAssignment[k] == j)
-                        cumulativeWeight += edges[k].love;
-                }
-                if (cumulativeWeight < minWeight) {
-                    minWeight = cumulativeWeight;
-                    groupIndex = j;
-                }
-            }
-            groupAssignment[i] = groupIndex;
-        }
-    }
-
-    // Print the 5 groups of vertices with the lowest weight
-    for (int i = 0; i < 5; i++) {
-        printf("Group %d: ", i+1);
-        for (int j = 0; j < numVertices; j++) {
-            if (groupAssignment[j] == i)
-                printf("%d ", j);
-        }
-        printf("\n");
-    }
-}
+// // Function to divide vertices into 5 groups with the lowest weight
+// void divideIntoGroups(Edge edges[], int numEdges, int numVertices) {
+//     // Sort the edges in ascending order based on their weights
+//     // qsort(edges, numEdges, sizeof(struct Edge), compareEdges);
+//     // heapSort(edges, 99);
+//     // Create an array to keep track of the group assignment for each vertex
+//     // 각 정점의 그룹 할당 여부를 담은 배열 생성 및 -1로 초기화. (-1 : 그룹 할당 되지 않음)
+//     for (int i = 0; i < numVertices; i++) {
+//         groupAssignment[i] = -1; // Initialize group assignment to -1 (no group)
+//     }
+//     // 5개의 그룹을 저장하기 위한 배열 group 생성.
+//     int groups[5];
+//     printf("그룹 배열 생성 및 초기화 완료\n");
+//     int parentStart;
+//     int parentEnd;
+//     // love(가중치)를 기준으로 오름차순 정렬된 edge를 순회.
+//     for (int i = 0; i < numEdges; i++) { 
+//         //edge 하나를 매개변수로 받은 edges 배열에서 꺼낸다.
+//         struct Edge currentEdge = edges[i];
+//         printf("Edge: [%d] [%f] [%d]\n", edges[i].me, edges[i].love, edges[i].you);
+//         // edge 가 cycle을 생성하게 되는지 parent 배열을 사용하여 검사.
+//         // cycle을 생성한다면 continue 하여 그룹에 포함시키지 않고 다음 edge를 탐색한다.
+//         parentStart = findParent(currentEdge.me);
+//         parentEnd = findParent(currentEdge.you);
+//         if (parentStart == parentEnd)
+//             continue;
+//         // 그룹 중 가장 낮은 가중치가 쌓인 그룹에 현재 간선을 추가한다.
+//         int groupIndex = -1;
+//         float minWeight = 2174583.0;
+//         for (int j = 0; j < 5; j++) {   // 그룹 number (1,2,3,4,5)
+//             float cumulativeWeight = 0;
+//             for (int k = 0; k < numVertices; k++) { // 각 정점(0~99)의 그룹 할당 여부 확인을 groupAssignment[100] 배열을 통해 검사.
+//                 if (groupAssignment[k] == j)    // 만약 정점 k 가 그룹 j에 할당되어 있으면, 
+//                     cumulativeWeight += edges[k].love;  // 정점 k의 간선 가중치를 cumulative weight 에 추가.
+//             }
+//             if (cumulativeWeight < minWeight) {
+//                 minWeight = cumulativeWeight;
+//                 groupIndex = j;
+//             }
+//         }
+//         groupAssignment[currentEdge.me] = groupIndex;
+//         groupAssignment[currentEdge.you] = groupIndex;
+//         printf("finish\n");
+//     }
+//     // 아직 그룹에 할당 되지 않은 정점이 있으면 가장 낮은 가중치를 가진 그룹에 추가.
+//     for (int i = 0; i < numVertices; i++) {
+//         if (groupAssignment[i] == -1) {
+//             int groupIndex = -1;
+//             float minWeight = 2174583.0;
+//             for (int j = 0; j < 5; j++) {
+//                 float cumulativeWeight = 0;
+//                 for (int k = 0; k < numVertices; k++) {
+//                     if (groupAssignment[k] == j)
+//                         cumulativeWeight += edges[k].love;
+//                 }
+//                 if (cumulativeWeight < minWeight) {
+//                     minWeight = cumulativeWeight;
+//                     groupIndex = j;
+//                 }
+//             }
+//             groupAssignment[i] = groupIndex;
+//         }
+//     }
+//     // Print the 5 groups of vertices with the lowest weight
+//     for (int i = 0; i < 5; i++) {
+//         printf("Group %d: ", i+1);
+//         for (int j = 0; j < numVertices; j++) {
+//             if (groupAssignment[j] == i)
+//                 printf("%d ", j);
+//         }
+//         printf("\n");
+//     }
+// }
 
 //////////////////////////////// test //////////////////////////////
 //////////////////////////////// FILE 저장 및 친밀도 계산 (시작) //////////////////////////////
@@ -933,15 +930,109 @@ int* search_duplicate_vertex(GraphType_ *group){
     return vertexArray;
 }
 
-void find_edge(GraphType_ *g, GraphType *d, vertices *v){
-    int g_n = 0;
-    for(int i = 0; i < 5; i++){
-
-        g[g_n].edges[g->n]
+////////////test
+int compare(const void* a, const void* b) {
+    Edge* edgeA = (Edge*)a;
+    Edge* edgeB = (Edge*)b;
+    if (edgeA->love < edgeB->love) {
+        return -1;
+    } else if (edgeA->love > edgeB->love) {
+        return 1;
+    } else {
+        return 0;
     }
 }
 
+void makeSet(int parent[], int rank[], int vertex) {
+    parent[vertex] = vertex;
+    rank[vertex] = 0;
+}
 
+int findSet(int parent[], int vertex) {
+    if (parent[vertex] != vertex) {
+        parent[vertex] = findSet(parent, parent[vertex]);
+    }
+    return parent[vertex];
+}
+
+void unionSets(int parent[], int rank[], int vertexA, int vertexB) {
+    int rootA = findSet(parent, vertexA);
+    int rootB = findSet(parent, vertexB);
+    if (rootA != rootB) {
+        if (rank[rootA] < rank[rootB]) {
+            parent[rootA] = rootB;
+        } else if (rank[rootA] > rank[rootB]) {
+            parent[rootB] = rootA;
+        } else {
+            parent[rootB] = rootA;
+            rank[rootA]++;
+        }
+    }
+}
+
+void createMST(const Edge edges[], int numEdges, const vertices* vertices, int numVertices) {
+    int parent[MAX_VERTICES];
+    int rank[MAX_VERTICES];
+    for (int i = 0; i < numVertices; i++) {
+        makeSet(parent, rank, vertices->v[i]);
+    }
+
+    Edge mst[MAX_VERTICES - 1];
+    int mstSize = 0;
+
+    for (int i = 0; i < numEdges && mstSize < numVertices - 1; i++) {
+        int vertexA = edges[i].me;
+        int vertexB = edges[i].you;
+
+        if (findSet(parent, vertexA) != findSet(parent, vertexB)) {
+            mst[mstSize++] = edges[i];
+            unionSets(parent, rank, vertexA, vertexB);
+        }
+    }
+
+    // Print the MST edges
+    printf("Minimum Spanning Tree:\n");
+    for (int i = 0; i < mstSize; i++) {
+        printf("Edge: %d-%d, Love: %.2f\n", mst[i].me, mst[i].you, mst[i].love);
+    }
+}
+
+////////////test
+
+int findValueInArray(const int arr[], int size, int value) {
+    for (int i = 0; i < size; i++) {
+        if (arr[i] == value) {
+            return 1; // Return the index of the found value
+        }
+    }
+
+    return -1; // Return -1 if the value is not found
+}
+
+void extractEdgesInRange(const GraphType_* graph, const vertices* range, GraphType_ *MST) {
+    // printf("Edges within the range:\n");
+    for (int i = 0; i < graph->n; i++) {
+        int start = graph->edges[i].me;
+        int end = graph->edges[i].you;
+
+        int startInRange = 0;
+        int endInRange = 0;
+
+        for (int j = 0; j < range->n; j++) {
+            if (start == range->v[j]) {
+                startInRange = 1;
+            }
+            if (end == range->v[j]) {
+                endInRange = 1;
+            }
+        }
+
+        if (startInRange && endInRange) {
+            // printf("Edge: %d-%d, Weight: %.2f\n", start, end, graph->edges[i].love);
+            insert_mst_edge(MST, start, end, graph->edges[i].love);
+        }
+    }
+}
 // 1. 크루스칼로 전체 MST를 찾고, 가장 큰 가중치를 가진 간선 4개와 해당 노드를 크루스칼 알고리즘에서 메인함수의 배열에 전달.
 // 2. K_graph의 edge에서 첫번째 간선을 삭제. -> 간선을 잇던 두 노드를 기준으로 prim 알고리즘.
 // 3. 두 그래프에서 다음 간선을 찾는다. -> 찾으면 과정2 반복.
@@ -954,13 +1045,14 @@ int main(void){
     calculate_love(data);
 
     /////// 100개 노드 그래프 생성 시작 ///////
-    // GraphType_ *g = (GraphType_*)malloc(sizeof(GraphType_));
+    GraphType_ *g = (GraphType_*)malloc(sizeof(GraphType_));
 
-    // graph_init(g);
+    graph_init(g);
 
-    // for(int i = 0; i < FILE_LEN; i++){
-    //     insert_edge(g, data[i].me, data[i].you, data[i].love, i);
-    // }
+    for(int i = 0; i < FILE_LEN; i++){
+        insert_edge(g, data[i].me, data[i].you, data[i].love);
+        insert_edge(g, data[i].you, data[i].me, data[i].love);
+    }
     // printf("정점 삽입 완료 : %d 개\n", g->n);
     // printf("간선 삽입 완료\n");
 
@@ -1001,21 +1093,59 @@ int main(void){
 
     // GraphType_* group = bfs_list(graph, 0);
 
-    vertices* group_vertices = bfs_list(graph, 0);
+    GraphType_ *MST_group = (GraphType_*)malloc(5 * sizeof(GraphType_));
+    vertices* group_vertices = bfs_list(graph, 0, MST_group);
     
+
+    for(int i = 0; i < 5; i++){
+        printf("=======================Kruskal group[%d]=======================\n", i + 1);
+        extractEdgesInRange(g, &group_vertices[i], &MST_group[i]);
+        kruskal(&MST_group[i], group_vertices[i].n);
+    }
+    // for(int a = 0; a < 5; a++){
+    //     for(int i = 0; i < graph->n; i++){
+    //         GraphNode* p = graph->adj_list[i];
+    //         printf("정점 %d의 인접 리스트: ", i);
+    //         while(p != NULL){
+    //             if(findValueInArray(group_vertices[a].v, 20, p->vertex)){
+
+    //             }
+    //             p = p->link;
+
+    //         }
+    //     }
+    // }
+
     // group.edges[]에 그룹마다의 정점 정보 있음.
     // 이걸 사용해서 기존 데이터 끌어와서 그룹을 다시 만든다.
     // 그리고 mst 도릴면 끝
 
-    for (int i = 0; i < 5; i++){
-        printf("--------------GROUP[%d]--------------\n", i + 1);
-        for(int j = 0; j < 20; j++){
-            printf("group[%d]: vertex[%d]\n", i + 1, group_vertices[i].v[j]);
-        }
-    }
+    // for (int i = 0; i < 5; i++){
+    //     printf("--------------GROUP[%d]--------------\n", i + 1);
+    //     for(int j = 0; j < 20; j++){
+    //         printf("group[%d]: edge[%d]: [%d] <-- [%f] --> [%d]\n", i + 1, j, MST_group[i].edges[j].me, MST_group[i].edges[j].love, MST_group[i].edges[j].you);
+    //     }
+    // }
 
 
-    GraphType_ *MST_group = (GraphType_*)malloc(5 * sizeof(GraphType_)); // graph init 해주자
+
+    // graph init
+    // int numEdges = sizeof(g->edges) / sizeof(g->edges[0]);
+    // qsort(g->edges, numEdges, sizeof(Edge), compare);
+    // for(int i = 0; i < numEdges; i++){
+    //     printf("[%d] %d %f %d\n", i, g->edges[i].me, g->edges[i].love, g->edges[i].you);
+    // }
+    // createMST(g->edges, numEdges, &group_vertices[0], 20);
+
+    // for(int i = 0; i < 5; i++){
+    //     for(int j = 0; j < 20; j++){
+    //         for(int k = 0; k < 20; k++){
+    //             group_vertices[i].v[j]
+    //         }
+    //     }
+    //     insert_edge(MST_group[i], j, k, )
+        
+    // }
     
 
     // for (int i = 0; i < 5; i++){
@@ -1031,20 +1161,6 @@ int main(void){
     // search_duplicate_vertex(&group[5]);
 
     // GraphType_ *MST_group = (GraphType_*)malloc(5 * sizeof(GraphType_));
-
-
-
-
-
-
-
-
-
-    // for(int i = 0; i < 5; i++){
-    //     printf("=======================Kruskal group[%d]=======================\n", i + 1);
-    //     kruskal(&group[i]);
-    // }
-
 
 
     
