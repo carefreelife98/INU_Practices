@@ -86,6 +86,7 @@ void insert_graph_edge(GraphType* g, int u, int v, float love){
     // g->adj_list[v] = node;
 
     // printf("%d -> 간선 추가 \n", node->me);
+    // free(node);
 }
 
 void print_adj_list(GraphType* g){
@@ -491,7 +492,11 @@ int main(void){
         extractEdgesInRange(g, &group_vertices[i], &MST_group[i]);
         kruskal(&MST_group[i], group_vertices[i].n);
     }
-  
+
+    free(g);
+    free(graph);
+    free(MST_group);
+    free(group_vertices);
     return 0;
 }
 
