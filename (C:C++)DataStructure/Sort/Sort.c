@@ -76,7 +76,7 @@ void shell_sort(int list[], int n){ // n = size
         for (i = 0; i < gap; i++){  // 부분 리스트의 개수는 gap과 같음.
             inc_insertion_sort(list, i, n - 1, gap);
         }
-
+    
     }
 }
 
@@ -129,6 +129,52 @@ void merge_sort(int list[], int left, int right){
     }
 }
 
+// 퀵 정렬
+int partition(int list[], int left, int right){
+    int pivot, temp;
+    int low, high;
+
+    // left는 pivot의 위치이지만 for문 들어가며 +1 증가되어 피봇 다음 index부터 시작하게 된다.
+    low = left;
+    // high도 마찬가지로 for문 들어가며 -1 감소되어 시작되기 때문에 배열을 넘어서는 인덱스부터 시작.
+    high = right + 1;
+    // 편의를 위해 피봇을 list의 첫 인덱스로 설정.
+    pivot = list[left];
+
+    do {
+        // 두 개의 do-while문
+        do
+            low++;
+        while (list[low] < pivot);
+        // low가 pivot보다 큰 (low 부분 리스트에 있으면 안되는) 요소에서 멈춤
+        
+        do
+            high--;
+        while (list[high] > pivot);
+        // high가 pivot보다 작은 (high 부분 리스트에 있으면 안되는) 요소에서 멈춤
+
+        // 위의 do while문에 의해 멈춰 있는 low / high 가 가리키고 있는 요소를 교환.
+        // (부적절한 요소가 있는 위치)
+        if(low < high) SWAP(list[low], list[high], temp);
+    }while (low < high); // low와 high가 교차하면 종료
+
+    // pivot(list[left])과 high의 요소를 바꾸어준다.
+    SWAP(list[left], list[high], temp);
+    
+    return high;    // high가 가리키는 곳으로 이동한 pivot의 인덱스를 반환
+}
+
+void quick_sort(int list[], int left, int right){
+    if(left < right){
+        // partition() 함수의 결과로 pivot 생성 후 리스트 분할.
+        int pivot = partition(list, left, right);
+        // left ~ pivot 전 요소까지 퀵 정렬
+        quick_sort(list, left, pivot - 1);
+        // pivot 이후 요소부터 right(끝)까지 퀵 정렬.
+        quick_sort(list, pivot + 1, right);
+    }
+}
+
 
 int main(void) {
 	int i;
@@ -136,8 +182,8 @@ int main(void) {
 	srand(time(NULL));
 	for (i = 0; i<n; i++)      	// 난수 생성 및 출력 
 		list[i] = rand() % 100; // 난수 발생 범위 0~99
-    printf("Merge Sort:\n");
-	merge_sort(list, 0, n - 1); // 쉘 정렬 호출
+    printf("Quick Sort:\n");
+	merge_sort(list, 0, n - 1); // 퀵 정렬 호출
 	for (i = 0; i<n; i++)
 		printf("%d ", list[i]);
 	printf("\n");
