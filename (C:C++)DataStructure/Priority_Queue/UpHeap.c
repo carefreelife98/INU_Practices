@@ -12,7 +12,18 @@ typedef struct {
     int heap_size;
 } HeapType;
 
+// Heap 동적 생성
+HeapType* create(){
+    return (HeapType *)malloc(sizeof(HeapType));
+}
 
+// Heap 초기화
+void init(HeapType *h){
+    h->heap_size = 0;
+}
+
+// 현재 요소의 개수가 heap_size 인 히프 h에 item을 삽입.
+// 삽입 함수
 void insert_max_heap(HeapType *h, element item){
     int i;
     i = ++(h->heap_size);
@@ -25,6 +36,7 @@ void insert_max_heap(HeapType *h, element item){
     h->heap[i] = item; // 비교가 끝나고 멈춘 자리에 새로운 노드를 삽입.
 }
 
+// 삭제 함수
 element delete_max_heap(HeapType *h){
     int parent, child;
     element item, temp;
@@ -49,3 +61,57 @@ element delete_max_heap(HeapType *h){
     h->heap[parent] = temp;
     return item;
 }
+
+void heap_sort(element a[], int n){
+    int i;
+    HeapType *h;
+
+    h = create();
+    init(h);
+    for(i = 0; i < n; i++){
+        insert_max_heap(h, a[i]);
+    }
+    for(i = (n-1); i >= 0; i--){
+        a[i] = delete_max_heap(h);
+    }
+    free(h);
+}
+
+#define SIZE 8
+int main(void)
+{
+	element list[SIZE] = { 23, 56, 11, 9, 56, 99, 27, 34 };
+    printf("Heap Sort:\n");
+	heap_sort(list, SIZE);
+	for (int i = 0; i < SIZE; i++) {
+		printf("%d ", list[i].key);
+	}
+	printf("\n");
+	return 0;
+}
+
+
+// int main(void) {
+// 	element e1 = { 10 }, e2 = { 5 }, e3 = { 30 };
+// 	element e4, e5, e6;
+// 	HeapType* heap;
+
+// 	heap = create(); 	// 히프 생성
+// 	init(heap);	// 초기화
+
+// 	// 삽입
+// 	insert_max_heap(heap, e1);
+// 	insert_max_heap(heap, e2);
+// 	insert_max_heap(heap, e3);
+
+// 	// 삭제
+// 	e4 = delete_max_heap(heap);
+// 	printf("< %d > ", e4.key);
+// 	e5 = delete_max_heap(heap);
+// 	printf("< %d > ", e5.key);
+// 	e6 = delete_max_heap(heap);
+// 	printf("< %d > \n", e6.key);
+
+// 	free(heap);
+// 	return 0;
+// }
