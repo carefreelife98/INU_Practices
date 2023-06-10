@@ -3,9 +3,9 @@ import random
 
 def merge(l1, l2):
     
-    i1 = 0; i2 = 0
+    i1 = 0
+    i2 = 0
     len_l1 = len(l1); len_l2 = len(l2)
-
 
     merged = []
     while i1 < len_l1 or i2 < len_l2:
