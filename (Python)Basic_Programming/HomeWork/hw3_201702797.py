@@ -7,7 +7,10 @@
 # 3. 과정2 반복 중 리스트 내의 요소가 2개가 되는 경우 -> 두번째 요소 반환 : ring[1]
 #
 #
-# 1억개 ->
+# 1억개 -> 대강 2.1초
+#
+# 3분 탐색?
+# or 보간 탐색?
 
 import random
 import time
@@ -33,8 +36,10 @@ def test(idx):
     return test_ring
 
 def auto_test():
+    # rand = random.randint(1, 10**8)
+    # test_ring = list(range(rand, 10**8 + rand*2))
     rand = random.randint(1, 10**8)
-    test_ring = list(range(rand, 10**8 + rand*2))
+    test_ring = list(range(1, 10**8 + 1))
     print(f'가장 작은 정수 : {rand} 리스트의 길이 : {len(test_ring)}')
     print(f'ring[0]: {test_ring[0]}, ring[1]: {test_ring[1]}, ring[2]: {test_ring[2]}')
 
