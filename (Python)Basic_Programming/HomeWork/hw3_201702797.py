@@ -23,6 +23,7 @@ def get_min_in_a_ring(ring: list) -> int:
             mid = len(ring) // 2
             low = ring[0]
 
+            print(f'low = {low} mid = {ring[mid]} high = {ring[len(ring) - 1]}')
             if len(ring) <= 2:
                 return ring[1]
             elif ring[mid] > low:
@@ -30,26 +31,21 @@ def get_min_in_a_ring(ring: list) -> int:
             else:
                 ring = ring[:mid + 1]
 
-def test(idx):
-    test_ring = list(range(3466, 10**8 + 1237))
-    test_ring = test_ring[idx:] + test_ring[:idx]
-    return test_ring
-
 def auto_test():
     # rand = random.randint(1, 10**8)
     # test_ring = list(range(rand, 10**8 + rand*2))
     rand = random.randint(1, 10**8)
     test_ring = list(range(1, 10**8 + 1))
     print(f'가장 작은 정수 : {rand} 리스트의 길이 : {len(test_ring)}')
-    print(f'ring[0]: {test_ring[0]}, ring[1]: {test_ring[1]}, ring[2]: {test_ring[2]}')
 
     test_ring = test_ring[rand:] + test_ring[:rand]
+    print(f'ring[0]: {test_ring[0]}, ring[1]: {test_ring[1]}, ring[2]: {test_ring[2]}')
     return test_ring
 
 if __name__ == '__main__':
     # index = random.randint(3466, 10**8 + 1236)
     # testlist = test(index)
-    for i in range(5):
+    for i in range(1):
         print(f'---------------------test [{i}]---------------------')
         start_t = time.time()
         print(get_min_in_a_ring(auto_test()))
@@ -114,4 +110,17 @@ if __name__ == '__main__':
 #             return temp
 #         return is_drop(ring)
 
+
+# # 보간 탐색
+# # 1. 만약 ring이 오름차순 정렬된 리스트라면 -> ring[0] 반환
+# # 2. 아니라면, ring[0] 과 ring[1] 의 차 = 정렬된 리스트 요소간의 차이 값
+# # 3. 리스트의 첫번째 요소와 마지막 요소의 차 = (요소 개수 - 1) * 차이 값
+# # 4. key = 두 요소의 차가 (요소 개수 - 1) * 차이 값
+# # 5. mid + high or mid + low 중 low가 더 크면
+# def find_key(l):
+#     differ = l[1] - l[0]
+#
+#     for i in range(len(l) - 1):
+#         if abs(l[i] - l[i+1]) == (len(l) - 1) * abs(differ):
+#             return l
 
